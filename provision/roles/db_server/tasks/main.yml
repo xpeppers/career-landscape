@@ -1,0 +1,17 @@
+---
+# tasks file for provision/roles/db_server
+- name: install postgresql
+  package:
+    name: postgresql
+    state: present
+
+- name: start postgresql
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: install python-psycopg2
+  package:
+    name: python-psycopg2
+    state: present

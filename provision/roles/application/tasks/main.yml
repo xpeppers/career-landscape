@@ -1,0 +1,36 @@
+---
+# tasks file for provision/roles/application
+- name: install python3.8
+  package:
+    name: python3.8
+    state: present
+
+- name: install pip
+  package:
+    name: python3-pip
+    state: present
+
+- name: install virtualenv
+  package:
+    name: python3-virtualenv
+    state: present
+
+- name: install setuptools
+  package:
+    name: python3-setuptools
+    state: present
+
+- name: install pipenv
+  shell: python3 -m pip install pipenv
+
+- name: Create a new database with name
+  postgresql_db:
+    name: "{{ DJ_COMPLETE_DB_NAME }}"
+  become_user: postgres
+
+- name: Connect to database, create user
+  postgresql_user:
+    db: "{{ DJ_COMPLETE_DB_NAME }}"
+    name: "{{ DJ_COMPLETE_USER }}"
+    password: "{{ DJ_COMPLETE_PSW }}"
+  become_user: postgres
