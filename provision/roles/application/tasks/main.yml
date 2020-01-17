@@ -25,12 +25,12 @@
 
 - name: Create a new database with name
   postgresql_db:
-    name: "{{ DJ_COMPLETE_DB_NAME }}"
+    name: "{{ DJ_DB_NAME }}"
   become_user: postgres
 
 - name: Connect to database, create user
   postgresql_user:
-    db: "{{ DJ_COMPLETE_DB_NAME }}"
-    name: "{{ DJ_COMPLETE_USER }}"
-    password: "{{ DJ_COMPLETE_PSW }}"
+    db: "{{ DJ_DB_NAME }}"
+    name: "{{ DJ_DB_USER }}"
+    password: "{{ DJ_DB_PSW }}"
   become_user: postgres

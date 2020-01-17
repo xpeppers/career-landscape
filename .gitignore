@@ -121,4 +121,6 @@ dmypy.json
 ### Pipenv .env variable
 .env
 
+provision/.DS_Store
+
 # End of https://www.gitignore.io/api/python,visualstudiocode
