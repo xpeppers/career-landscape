@@ -33,4 +33,5 @@
     db: "{{ DJ_DB_NAME }}"
     name: "{{ DJ_DB_USER }}"
     password: "{{ DJ_DB_PSW }}"
+    role_attr_flags: CREATEDB
   become_user: postgres
