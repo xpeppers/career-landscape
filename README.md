@@ -1,6 +1,6 @@
 # Career Landscape
 
-...
+[![Build Status](https://travis-ci.com/xpeppers/career-landscape.svg?branch=master)](https://travis-ci.com/xpeppers/career-landscape)
 
 ## Dependencies
 
