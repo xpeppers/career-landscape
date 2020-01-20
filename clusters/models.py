@@ -40,6 +40,3 @@ class Score(models.Model):
 
     def __str__(self):
         return f"{self.person} has assigned {self.value} in {self.dimension}"
-
-
-

@@ -1,0 +1,30 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Clusters</title>
+  <meta name="description" content="The Clusters">
+  <meta name="author" content="Cecilia">
+</head>
+
+<body>
+
+  <h1>{{circle_name}}</h1>
+
+  {% if topics_names %}
+
+  <h2>Topics</h2>
+  <ul>
+    {% for top in topics_names %}
+      <h4><li>{{top}}</li></h4>
+    {% endfor %}
+  </ul>
+
+  {% else %}
+  <p>No Topic available.</p>
+  {% endif %}
+
+</body>
+</html>

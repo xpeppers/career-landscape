@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Circle, Topic, Dimension, Score
+
+admin.site.register(Circle)
+admin.site.register(Topic)
+admin.site.register(Dimension)
+admin.site.register(Score)
