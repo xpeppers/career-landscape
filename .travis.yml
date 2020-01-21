@@ -22,9 +22,9 @@ before_install:
   - sudo apt-get -y install python-psycopg2
 
 install:
-  - pipenv install
+  - pipenv install --dev
 
 script:
   - pipenv run python manage.py migrate
-  - pipenv run python -m black ./
+  - pipenv run black ./
   - pipenv run python manage.py test
