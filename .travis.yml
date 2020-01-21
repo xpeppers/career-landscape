@@ -1,3 +1,11 @@
+notifications:
+  email:
+    recipients:
+      - stefano.sarioli@it.clara.net
+      - cecilia.manzoni@it.clara.net
+    on_success: change
+    on_failure: always
+
 language: python
 
 python:
