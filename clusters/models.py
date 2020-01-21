@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Circle(models.Model):
     name = models.CharField(max_length=500)
 
@@ -9,6 +10,7 @@ class Circle(models.Model):
 
     def __str__(self):
         return f"{self.name} Circle"
+
 
 class Topic(models.Model):
     name = models.CharField(max_length=500)
@@ -20,6 +22,7 @@ class Topic(models.Model):
     class Meta:
         unique_together = (("name", "circle"),)
 
+
 class Dimension(models.Model):
     name = models.CharField(max_length=200)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
@@ -29,6 +32,7 @@ class Dimension(models.Model):
 
     class Meta:
         unique_together = (("name", "topic"),)
+
 
 class Score(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE)
