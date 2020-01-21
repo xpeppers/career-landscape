@@ -94,19 +94,21 @@
   </div>
   <script>
     const topics_details = JSON.parse("{{topics_details}}".replace(/&#x27;/gi, '"'));
+    const max_range = Math.max(...(Object.values(topics_details)))
 
     data = [{
-    type: 'scatterpolar',
-    r: Object.values(topics_details),
-    theta: Object.keys(topics_details),
-    fill: 'toself'
+      type: 'scatterpolar',
+      r: Object.values(topics_details),
+      theta: Object.keys(topics_details),
+      fill: 'toself'
     }];
 
     layout = {
     polar: {
         radialaxis: {
-        visible: true,
-        range: [0, 5]
+          visible: true,
+          range: [0, max_range + 1],
+          dtick: 1
         }
     },
     showlegend: false
