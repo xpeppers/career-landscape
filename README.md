@@ -13,13 +13,13 @@ You need this installs to proceed:
 
 Create a .env file with these variables:
 
-- DJ_SECRET_KEY=random secret key
+- DJ_SECRET_KEY="random secret key"
 - DJ_DEBUG="1" for True or "0"
-- DJ_DB_NAME=a database name
-- DJ_DB_USER=a database user
-- DJ_DB_PSW=the user password
-- DJ_HOST="localhost"
-- DJ_PORT="" for local development
+- DJ_DB_NAME="a database name"
+- DJ_DB_USER="a database user"
+- DJ_DB_PSW="the user password"
+- DJ_DB_HOST="localhost"
+- DJ_DB_PORT="" for local development
 
 ## Instructions
 
