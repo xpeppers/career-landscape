@@ -105,7 +105,7 @@ class IndexViewTest(TestCase):
         self.assertContains(response,'topic2 : 0')
         self.assertContains(response,'topic3 : 1')
 
-    def test_index_add_correct_context(self):
+    def test_index_add_expected_context(self):
         self.set_sample_with_score_values([1,1,0,1])
         index = IndexView()
 
@@ -115,13 +115,34 @@ class IndexViewTest(TestCase):
         topics_details = {'topic0': 1, 'topic1': 1, 'topic2': 0, 'topic3': 1}
         self.assertEqual(context['topics_details'], topics_details)
 
+    def test_count_people_in_topic_return_expected_value(self):
+        circle = Circle(name='circle')
+        circle.save()
+        topic_name = 'topic'
+        topic = Topic(name=topic_name,circle=circle)
+        topic.save()
+        dimension = Dimension(name="dimension", topic=topic)
+        dimension.save()
+        person = User.objects.create_user(username='user_username', email='user_mail', password='user_password')
+        person_two = User.objects.create_user(username='user_username_two', email='user_mail_two', password='user_password_two')
+
+        score_first = Score(person=person, dimension=dimension, value=0)
+        score_first.save()
+        score_second = Score(person=person_two, dimension=dimension, value=1)
+        score_second.save()
+
+        index = IndexView()
+        value = index.count_people_in_topic(topic)
+
+        self.assertEqual(value, 1)
+
     def set_sample_with_score_values(self, values):
         person = User.objects.create_user(username='user_username', email='user_mail', password='user_password')
         circle = Circle(name='circle')
         circle.save()
         for i in range(0,len(values)):
             topic_name = 'topic'+str(i)
-            self.set_score(circle, topic_name,'dimension', person, values[i])
+            self.set_score(circle, topic_name, 'dimension', person, values[i])
 
     def set_score( self, circle, topic_name, dimension_name, person, value ):
         topic = Topic(name=topic_name, circle=circle)

@@ -23,9 +23,8 @@ class IndexView(generic.TemplateView):
 
     def count_people_in_topic(self, topic):
         dimensions_of_topic = Dimension.objects.filter(topic=topic)
-        score_of_topic = Score.objects.filter(dimension__in=dimensions_of_topic)
-        scores = score_of_topic.filter(value__gt=0)
-        if scores.count() < 1:
-            return 0
-        score_one_per_person = scores.distinct('person')
-        return score_one_per_person.count()
+        return Score.objects \
+            .filter(dimension__in=dimensions_of_topic) \
+            .filter(value__gt=0) \
+            .distinct('person') \
+            .count()
