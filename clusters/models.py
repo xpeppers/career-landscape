@@ -18,7 +18,7 @@ class Topic(models.Model):
         return f"{self.name} Topic"
 
     class Meta:
-        unique_together = (("name","circle"),)
+        unique_together = (("name", "circle"),)
 
 class Dimension(models.Model):
     name = models.CharField(max_length=200)
@@ -28,7 +28,7 @@ class Dimension(models.Model):
         return f"{self.name} Dimension of Knowledge: {self.topic}"
 
     class Meta:
-        unique_together = (("name","topic"),)
+        unique_together = (("name", "topic"),)
 
 class Score(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE)

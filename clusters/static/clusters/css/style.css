@@ -1,0 +1,20 @@
+p {
+    font-family: 'Dosis', sans-serif;
+}
+
+li {
+    font-family: 'Dosis', sans-serif;
+}
+
+.title {
+    font-family: 'Kaushan Script', cursive;
+}
+
+.lead {
+    font-family: 'Dosis', sans-serif;
+}
+
+.card-align {
+    margin: auto;
+    width: 50%;
+}

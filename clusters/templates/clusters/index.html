@@ -1,30 +1,129 @@
 <!doctype html>
 
+{% load static %}
+
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
 
   <title>Clusters</title>
   <meta name="description" content="The Clusters">
   <meta name="author" content="Cecilia">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Dosis|Kaushan+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static "clusters/css/style.css" %}">
+
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
 </head>
 
 <body>
 
-  <h1>{{circle_name}}</h1>
+  <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Xpeppers</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="#">Features</a>
+        <a class="nav-item nav-link" href="#">Pricing</a>
+        <a class="nav-item nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </div>
+    </div>
+  </nav>
 
-  {% if topics_names %}
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="display-4 title">Career Landscape</h1>
+      <p class="lead">
+        <hr>
+        <h4>Why Landscape</h4>
+        We believe that people knowledge is best represented as a landscape, with hills and valley, peaks and
+        depression, more than a ledger like is usualy represented. The idea of a landscape is more linked to a non
+        linear path (and in some way random path) of knowledge development, instead of a linear predefined path,
+        suitable for everyone.
+        <br> We want a tool to have a discussion on how the person feels are is strong point and is weakness, and in
+        which topics he wants to invest time and energy in the following month.
+      </p>
+    </div>
+  </div>
 
-  <h2>Topics</h2>
-  <ul>
-    {% for top in topics_names %}
-      <h4><li>{{top}}</li></h4>
-    {% endfor %}
-  </ul>
+  <div class='container-fluid'>
 
-  {% else %}
-  <p>No Topic available.</p>
-  {% endif %}
+    <div class='row'>
 
+      <div class='col-md-4'>
+
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            {% if circle_name %}
+              <h4 class="card-title title">{{circle_name}} Circle</h4>
+              <h5 class="card-subtitle mb-2 text-muted">Topics:</h5>
+              <p class="card-text">Here the Delivery Circle description.</p>
+              {% if topics_details %}
+                <ul>
+                  {% for name, number in topics_details.items %}
+                    <h6>
+                      <li>{{name}} : {{number}} </li>
+                    </h6>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p>No Topics available.</p>
+              {% endif %}
+            {% else %}
+              <p>No Circle available.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class='col-md-8'>
+        <div class='media' id="radar" style="width:500px;height:500px;"></div>
+      </div>
+
+    </div>
+
+  </div>
+  <script>
+    const topics_details = JSON.parse("{{topics_details}}".replace(/&#x27;/gi, '"'));
+
+    data = [{
+    type: 'scatterpolar',
+    r: Object.values(topics_details),
+    theta: Object.keys(topics_details),
+    fill: 'toself'
+    }];
+
+    layout = {
+    polar: {
+        radialaxis: {
+        visible: true,
+        range: [0, 5]
+        }
+    },
+    showlegend: false
+    };
+
+    Plotly.plot(document.getElementById('radar'), data, layout);
+  </script>
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+  integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+  integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+  crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+  integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+  crossorigin="anonymous"></script>
 </body>
+
+
 </html>

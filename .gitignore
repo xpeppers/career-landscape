@@ -120,7 +120,10 @@ dmypy.json
 ### Pipenv .env variable
 .env
 
+# DS_Store files
 provision/.DS_Store
+**/.DS_Store
+*/.DS_Store
 
 ### Vagrant ###
 .vagrant/
