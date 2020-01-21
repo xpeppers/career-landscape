@@ -76,14 +76,14 @@ class IndexViewTest(TestCase):
         topic = Topic(name=topic_name, circle=circle)
         topic.save()
 
-        response = client.get("/clusters/")
+        response = client.get("/")
         self.assertContains(response, circle_name)
         self.assertContains(response, topic_name)
 
     def test_index_with_no_circle_print_message(self):
         client = Client()
 
-        response = client.get("/clusters/")
+        response = client.get("/")
         self.assertContains(response, "No Circle available.")
 
     def test_index_with_no_topic_in_circle_print_message(self):
@@ -91,14 +91,14 @@ class IndexViewTest(TestCase):
         circle = Circle(name="testCircle")
         circle.save()
 
-        response = client.get("/clusters/")
+        response = client.get("/")
         self.assertContains(response, "No Topics available.")
 
     def test_index_shows_topics_numbers(self):
         client = Client()
         self.set_sample_with_score_values([1, 1, 0, 1])
 
-        response = client.get("/clusters/")
+        response = client.get("/")
         self.assertContains(response, "topic0 : 1")
         self.assertContains(response, "topic1 : 1")
         self.assertContains(response, "topic2 : 0")
@@ -141,6 +141,7 @@ class IndexViewTest(TestCase):
 
         self.assertEqual(value, 1)
 
+
     def set_sample_with_score_values(self, values):
         person = User.objects.create_user(
             username="user_username", email="user_mail", password="user_password"
@@ -158,3 +159,4 @@ class IndexViewTest(TestCase):
         dimension.save()
         score = Score(person=person, dimension=dimension, value=value)
         score.save()
+
