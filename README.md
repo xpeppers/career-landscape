@@ -25,7 +25,7 @@ Create a .env file with these variables:
 
 Development setup, run these commands:
 
-```
+```blank
 vagrant up
 vagrant ssh
 cd /vagrant/
@@ -39,16 +39,23 @@ python3 manage.py createsuperuser
 
 For testing the application:
 
-```
+```blank
 python3 manage.py test
 ```
 
+## Run Linter
+
+For testing the application:
+
+```blank
+black ./
+```
 
 ## Run
 
 To run the application:
 
-```
+```blank
 python3 manage.py runserver 0:8000
 ```
 
