@@ -43,6 +43,20 @@ For testing the application:
 python3 manage.py test
 ```
 
+### Get tests coverage
+
+Run:
+
+```blank
+coverage run --source='.' manage.py test
+```
+
+To see the report run:
+
+```blank
+coverage report
+```
+
 ## Run Linter
 
 For testing the application:
