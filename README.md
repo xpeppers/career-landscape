@@ -70,7 +70,7 @@ black ./
 Apply seed sample dataset
 
 ```blank
-python3 manage.py loaddata seed.json
+python3 manage.py loaddata fixtures/seed.json
 ```
 
 ## Run
