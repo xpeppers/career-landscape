@@ -71,17 +71,15 @@
                       <option value=4> > 4 </option>
                     </select>
                   </div>
-                  <input type="submit" name="apply" value="Apply">
-                </form>
                 <hr>
-                <form action="{% url 'clusters:index' %}" method="get">
                   <div class="form-group">
                     <label for="topic_dimension_eq">Dimension Filter</label>
                       {% if dimension_filter %}
                         <p> Dimension Filter Setted: {{ dimension_filter }} </p>
                       {% endif %}
                     <select class="form-control" name="topic_dimension_eq" id="topic_dimension_eq">
-                    {% for dimension in dimensions %}
+                      <option value="" > All </option>
+                      {% for dimension in dimensions %}
                       <option value={{dimension}} > {{dimension}} </option>
                     {% endfor %}
                     </select>
