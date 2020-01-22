@@ -40,7 +40,7 @@ python3 manage.py createsuperuser
 For testing the application:
 
 ```blank
-python3 manage.py test
+python3 manage.py test clusters/tests/test_models
 ```
 
 ### Get tests coverage
@@ -48,7 +48,7 @@ python3 manage.py test
 Run:
 
 ```blank
-coverage run --source='.' manage.py test
+coverage run --source='.' manage.py test clusters/tests/test_models
 ```
 
 To see the report run:

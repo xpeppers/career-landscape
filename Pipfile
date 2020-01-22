@@ -10,6 +10,7 @@ coverage = "*"
 [packages]
 django = "*"
 psycopg2-binary = "*"
+factory-boy = "*"
 
 [requires]
 python_version = "3.8"
