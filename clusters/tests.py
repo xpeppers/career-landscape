@@ -104,6 +104,45 @@ class IndexViewTest(TestCase):
         self.assertContains(response, "topic2 : 0")
         self.assertContains(response, "topic3 : 1")
 
+    def test_filtered_view_shows_only_selected_range_of_values(self):
+        client = Client()
+        self.set_sample_with_score_values([1, 5, 4, 2])
+
+        response = client.get("/", {'topic_value_gt' : 3})
+        self.assertContains(response, "topic0 : 0")
+        self.assertContains(response, "topic1 : 1")
+        self.assertContains(response, "topic2 : 1")
+        self.assertContains(response, "topic3 : 0")
+
+    def test_filtered_view_shows_only_selected_dimensions_score(self):
+        client = Client()
+        circle = Circle(name="circle")
+        circle.save()
+        topic = Topic(name="topic", circle=circle)
+        topic.save()
+        dimension_one = Dimension(name="dimension_one", topic=topic)
+        dimension_one.save()
+        dimension_two = Dimension(name="dimension_two", topic=topic)
+        dimension_two.save()
+        person = User.objects.create_user(
+            username="user_username",
+            email="user_mail",
+            password="user_password"
+        )
+        person_two = User.objects.create_user(
+            username="user_username_two",
+            email="user_mail_two",
+            password="user_password_two"
+        )
+
+        score_first = Score(person=person, dimension=dimension_one, value=5)
+        score_first.save()
+        score_second = Score(person=person_two, dimension=dimension_two, value=5)
+        score_second.save()
+
+        response = client.get("/", {'topic_dimension_eq' : 'dimension_one'})
+        self.assertContains(response, "topic : 1")
+
     def test_index_add_expected_context(self):
         self.set_sample_with_score_values([1, 1, 0, 1])
         index = IndexView()
@@ -123,7 +162,9 @@ class IndexViewTest(TestCase):
         dimension = Dimension(name="dimension", topic=topic)
         dimension.save()
         person = User.objects.create_user(
-            username="user_username", email="user_mail", password="user_password"
+            username="user_username",
+            email="user_mail",
+            password="user_password"
         )
         person_two = User.objects.create_user(
             username="user_username_two",

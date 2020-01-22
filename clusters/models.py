@@ -28,7 +28,7 @@ class Dimension(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.name} Dimension of Knowledge: {self.topic}"
+        return f"{self.topic} - Dimension of Knowledge: {self.name}"
 
     class Meta:
         unique_together = (("name", "topic"),)

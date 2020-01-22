@@ -8,8 +8,7 @@
   <meta charset="utf-8">
 
   <title>Clusters</title>
-  <meta name="description" content="The Clusters">
-  <meta name="author" content="Cecilia">
+  <meta name="description" content="clusters">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -20,42 +19,24 @@
 
 
 </head>
-
 <body>
 
   <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Xpeppers</a>
+    <a class="navbar-brand title" href="{% url 'clusters:index' %}">Career Landscape</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
       aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-        <a class="nav-item nav-link" href="#">Features</a>
-        <a class="nav-item nav-link" href="#">Pricing</a>
-        <a class="nav-item nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-      </div>
+        <a class="nav-item nav-link active" href="#">About <span class="sr-only">(current)</span></a>
+     </div>
     </div>
   </nav>
 
-  <div class="jumbotron jumbotron-fluid">
-    <div class="container">
-      <h1 class="display-4 title">Career Landscape</h1>
-      <p class="lead">
-        <hr>
-        <h4>Why Landscape</h4>
-        We believe that people knowledge is best represented as a landscape, with hills and valley, peaks and
-        depression, more than a ledger like is usualy represented. The idea of a landscape is more linked to a non
-        linear path (and in some way random path) of knowledge development, instead of a linear predefined path,
-        suitable for everyone.
-        <br> We want a tool to have a discussion on how the person feels are is strong point and is weakness, and in
-        which topics he wants to invest time and energy in the following month.
-      </p>
-    </div>
-  </div>
-
   <div class='container-fluid'>
+
+  <hr>
 
     <div class='row'>
 
@@ -75,6 +56,39 @@
                     </h6>
                   {% endfor %}
                 </ul>
+
+                <form action="{% url 'clusters:index' %}" method="get">
+                  <div class="form-group">
+                    <label for="topic_value_gt">Value Filter</label>
+                    {% if value_filter %}
+                      <p> Value Filter Setted: > {{ value_filter }} </p>
+                    {% endif %}
+                    <select class="form-control" name="topic_value_gt" id="topic_value_gt">
+                      <option value=0> > 0 </option>
+                      <option value=1> > 1 </option>
+                      <option value=2> > 2 </option>
+                      <option value=3> > 3 </option>
+                      <option value=4> > 4 </option>
+                    </select>
+                  </div>
+                  <input type="submit" name="apply" value="Apply">
+                </form>
+                <hr>
+                <form action="{% url 'clusters:index' %}" method="get">
+                  <div class="form-group">
+                    <label for="topic_dimension_eq">Dimension Filter</label>
+                      {% if dimension_filter %}
+                        <p> Dimension Filter Setted: {{ dimension_filter }} </p>
+                      {% endif %}
+                    <select class="form-control" name="topic_dimension_eq" id="topic_dimension_eq">
+                    {% for dimension in dimensions %}
+                      <option value={{dimension}} > {{dimension}} </option>
+                    {% endfor %}
+                    </select>
+                  </div>
+                  <input type="submit" name="apply" value="Apply">
+                </form>
+
               {% else %}
                 <p>No Topics available.</p>
               {% endif %}

@@ -65,6 +65,14 @@ For testing the application:
 black ./
 ```
 
+## Populate DB
+
+Apply seed sample dataset
+
+```blank
+python3 manage.py loaddata seed.json
+```
+
 ## Run
 
 To run the application:

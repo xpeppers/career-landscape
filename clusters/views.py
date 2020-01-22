@@ -9,26 +9,37 @@ class IndexView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = self.add_first_cirle_context(context)
+        value_filter = self.request.GET.get('topic_value_gt', 0)
+        dimension_filter = self.request.GET.get('topic_dimension_eq', "")
+        context = self.add_first_cirle_context(context, value_filter, dimension_filter)
+        context['value_filter'] = value_filter
+        context['dimension_filter'] = dimension_filter
+
         return context
 
-    def add_first_cirle_context(self, context):
+    def add_first_cirle_context(self, context, value_filter=0, dimension_filter=""):
 
         for circle in Circle.objects.all():
             context["circle_name"] = circle.name
             topics = Topic.objects.filter(circle=circle).distinct()
             context["topics_details"] = {
-                topic.name: self.count_people_in_topic(topic) for topic in topics
+                topic.name: self.count_people_in_topic(topic, value_filter, dimension_filter) for topic in topics
             }
+            context['dimensions'] = Dimension.objects.filter(topic__in=topics) \
+                                    .distinct() \
+                                    .values_list('name', flat=True)
             return context
 
         return context
 
-    def count_people_in_topic(self, topic):
-        dimensions_of_topic = Dimension.objects.filter(topic=topic)
+    def count_people_in_topic(self, topic, value_filter=0, dimension_filter=""):
+        dimensions = Dimension.objects.filter(topic=topic)
+        if dimension_filter:
+            dimensions = [dimensions.get(name=dimension_filter)]
+
         return (
-            Score.objects.filter(dimension__in=dimensions_of_topic)
-            .filter(value__gt=0)
+            Score.objects.filter(dimension__in=dimensions)
+            .filter(value__gt=value_filter)
             .distinct("person")
             .count()
         )
