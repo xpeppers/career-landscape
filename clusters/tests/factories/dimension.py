@@ -8,5 +8,5 @@ class DimensionFactory(factory.DjangoModelFactory):
         model = 'clusters.Dimension'
         django_get_or_create = ('name','topic')
 
-    name = 'dimension'
+    name = factory.Sequence(lambda n: 'dimension%d' % n)
     topic = factory.SubFactory(TopicFactory)

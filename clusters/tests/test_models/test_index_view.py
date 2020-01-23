@@ -61,7 +61,7 @@ class IndexViewTest(TestCase):
     def test_filtered_view_shows_only_selected_dimensions_score(self):
         client = Client()
         circle = CircleFactory.create()
-        topic = TopicFactory.create(circle=circle)
+        topic = TopicFactory.create(name="topic", circle=circle)
         dimension_one = DimensionFactory.create(name="dimension_one", topic=topic)
         dimension_two = DimensionFactory.create(name="dimension_two", topic=topic)
         people = create_users(2)
@@ -77,12 +77,16 @@ class IndexViewTest(TestCase):
     def test_index_add_expected_context(self):
         create_sample_with_score_values([1, 1, 0, 1])
         index = IndexView()
+        topics_names = ["topic0","topic1","topic2","topic3"]
 
-        context = index.add_first_cirle_context({})
+        context = index.add_cirles_context({})
+        self.assertNotEqual(context.get('circles'),None)
+        circle = context["circles"]
+        self.assertNotEqual(circle.get("circle"),None)
 
-        self.assertEqual(context["circle_name"], "circle")
-        topics_details = {"topic0": 1, "topic1": 1, "topic2": 0, "topic3": 1}
-        self.assertEqual(context["topics_details"], topics_details)
+        topics_details = circle['circle']['topics_details']
+        for topic_name in topics_names:
+           self.assertNotEqual(topics_details.get(topic_name),None)
 
     def test_count_people_in_topic_return_expected_value(self):
         circle = CircleFactory.create()
@@ -100,4 +104,14 @@ class IndexViewTest(TestCase):
         value = index.count_people_in_topic(topic)
 
         self.assertEqual(value, 1)
+
+    def test_index_view_shows_all_circle_names(self):
+        client = Client()
+        circles = [ CircleFactory.create() for _ in range(4) ]
+        circles_names = [ circle.name for circle in circles ]
+
+        response = client.get("/")
+
+        for name in circles_names:
+            self.assertContains(response,name)
 

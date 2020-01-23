@@ -9,8 +9,7 @@ from .user import UserFactory
 
 
 def create_sample_with_score_values(values):
-    circle = CircleFactory.build()
-    circle.save()
+    circle = CircleFactory.create(name='circle')
     person = UserFactory.build()
     person.save()
     topics = [TopicFactory.create(name=f'topic{n}', circle=circle) for n in range(len(values)) ]

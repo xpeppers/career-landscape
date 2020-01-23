@@ -8,5 +8,5 @@ class TopicFactory(factory.DjangoModelFactory):
         model = 'clusters.Topic'
         django_get_or_create = ('name','circle')
 
-    name = 'topic'
+    name = factory.Sequence(lambda n: 'topic%d' % n)
     circle = factory.SubFactory(CircleFactory)

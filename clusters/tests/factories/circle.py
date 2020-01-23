@@ -6,4 +6,4 @@ class CircleFactory(factory.DjangoModelFactory):
         model = 'clusters.Circle'
         django_get_or_create = ('name',)
 
-    name = 'circle'
+    name = factory.Sequence(lambda n: 'circle%d' % n)
