@@ -57,35 +57,43 @@
                   {% endfor %}
                 </ul>
 
+                {% with get_param=request.GET %}
                 <form action="{% url 'clusters:index' %}" method="get">
                   <div class="form-group">
                     <label for="topic_value_gt">Value Filter</label>
-                    {% if value_filter %}
-                      <p> Value Filter Setted: > {{ value_filter }} </p>
+                    {% if get_param.topic_value_gt %}
+                      <p> Value Filter Setted: > {{ get_param.topic_value_gt }} </p>
                     {% endif %}
                     <select class="form-control" name="topic_value_gt" id="topic_value_gt">
-                      <option value=0> > 0 </option>
-                      <option value=1> > 1 </option>
-                      <option value=2> > 2 </option>
-                      <option value=3> > 3 </option>
-                      <option value=4> > 4 </option>
+                      {% for i in '01234'|make_list %}
+                        {% if i == get_param.topic_value_gt %}
+                          <option selected='selected' value={{ i }} > > {{ i }}</option>
+                        {% else %}
+                          <option value={{ i }} > > {{ i }}</option>
+                        {% endif %}
+                      {% endfor %}
                     </select>
                   </div>
                 <hr>
                   <div class="form-group">
                     <label for="topic_dimension_eq">Dimension Filter</label>
-                      {% if dimension_filter %}
-                        <p> Dimension Filter Setted: {{ dimension_filter }} </p>
+                      {% if get_param.topic_dimension_eq %}
+                        <p> Dimension Filter Setted: {{ get_param.topic_dimension_eq }} </p>
                       {% endif %}
                     <select class="form-control" name="topic_dimension_eq" id="topic_dimension_eq">
                       <option value="" > All </option>
                       {% for dimension in dimensions %}
-                      <option value={{dimension}} > {{dimension}} </option>
+                      {% if dimension == get_param.topic_dimension_eq %}
+                        <option selected="selected" value={{dimension}} > {{dimension}} </option>
+                      {% else %}
+                        <option value={{dimension}} > {{dimension}} </option>
+                      {% endif %}
                     {% endfor %}
                     </select>
                   </div>
                   <input type="submit" name="apply" value="Apply">
                 </form>
+                {% endwith %}
 
               {% else %}
                 <p>No Topics available.</p>
@@ -104,6 +112,13 @@
     </div>
 
   </div>
+
+  <footer id="sticky-footer" class="py-4 bg-dark text-white-50" style="margin-top: 40px;">
+    <div class="container text-center">
+      <small>Copyright &copy; <p class="title">Career Landscape</p></small>
+    </div>
+  </footer>
+
   <script>
     const topics_details = JSON.parse("{{topics_details}}".replace(/&#x27;/gi, '"'));
     const max_range = Math.max(...(Object.values(topics_details)))

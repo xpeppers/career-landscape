@@ -18,3 +18,7 @@ li {
     margin: auto;
     width: 50%;
 }
+
+#sticky-footer {
+    margin-top: 40px;
+}
