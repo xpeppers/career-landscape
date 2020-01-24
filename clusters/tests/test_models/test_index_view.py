@@ -118,3 +118,55 @@ class IndexViewTest(TestCase):
         for name in circles_names:
             self.assertContains(response,name)
 
+    def test_index_view_shows_all_topics_of_different_circles(self):
+        client = Client()
+        first_circle = CircleFactory.create()
+        second_circle = CircleFactory.create()
+        first_circle_topics = [ TopicFactory.create(circle=first_circle) for _ in range(3)]
+        second_circle_topics = [ TopicFactory.create(circle=second_circle) for _ in range(3)]
+
+        response = client.get("/")
+
+        topics_names = [ topic.name for topic in first_circle_topics ] + [ topic.name for topic in second_circle_topics ]
+        for topic_name in topics_names:
+            self.assertContains(response, topic_name)
+
+    def test_alter_circle_value_filter_not_alter_others_circle_value_filter(self):
+        client = Client()
+        person = create_users(1)[0]
+        first_circle = CircleFactory.create()
+        second_circle = CircleFactory.create()
+        first_circle_topic = TopicFactory.create(circle=first_circle)
+        second_circle_topic = TopicFactory.create(circle=second_circle)
+        first_circle_dimension = DimensionFactory.create(topic=first_circle_topic)
+        second_circle_dimension = DimensionFactory.create(topic=second_circle_topic)
+        first_circle_score = ScoreFactory.create(dimension=first_circle_dimension, value=3, person=person)
+        second_circle_score = ScoreFactory.create(dimension=second_circle_dimension, value=3, person=person)
+
+        response = client.get("/", {f'topic_value_gt_{first_circle.id}' : 4})
+
+        self.assertContains(response, f'{first_circle_topic.name} : 0')
+        self.assertContains(response, f'{second_circle_topic.name} : 1')
+
+    def test_alter_circle_dimension_filter_not_alter_others_circle_dimension_filter(self):
+        client = Client()
+        person = create_users(1)[0]
+        first_circle = CircleFactory.create()
+        second_circle = CircleFactory.create()
+        first_circle_topic = TopicFactory.create(circle=first_circle)
+        second_circle_topic = TopicFactory.create(circle=second_circle)
+        first_circle_dimension_populated = DimensionFactory.create(name='dimension_1', topic=first_circle_topic)
+        first_circle_dimension_empty = DimensionFactory.create(name='dimension_2', topic=first_circle_topic)
+        second_circle_dimension = DimensionFactory.create(name='dimension_1', topic=second_circle_topic)
+        first_circle_score = ScoreFactory.create(dimension=first_circle_dimension_populated, person=person)
+        second_circle_score = ScoreFactory.create(dimension=second_circle_dimension, person=person)
+
+        response = client.get("/", {f'topic_dimension_eq_{first_circle.id}' : f'{first_circle_dimension_empty.id}' })
+
+        self.assertContains(response, f'{first_circle_topic.name} : 0')
+        self.assertContains(response, f'{second_circle_topic.name} : 1')
+
+
+
+
+
