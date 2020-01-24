@@ -1,7 +1,6 @@
-from django.test import TestCase, Client
+from django.test import RequestFactory, TestCase, Client
 from django.db.utils import IntegrityError
 from django.contrib.auth.models import User
-
 
 from clusters.tests.factories.factory_methods import *
 
@@ -51,8 +50,9 @@ class IndexViewTest(TestCase):
     def test_filtered_view_shows_only_selected_range_of_values(self):
         client = Client()
         create_sample_with_score_values([1, 5, 4, 2])
+        circle_id = Topic.objects.filter(name='topic0').first().circle.id
 
-        response = client.get("/", {'topic_value_gt' : 3})
+        response = client.get("/", {f'topic_value_gt_{circle_id}' : 3})
         self.assertContains(response, "topic0 : 0")
         self.assertContains(response, "topic1 : 1")
         self.assertContains(response, "topic2 : 1")
@@ -71,13 +71,16 @@ class IndexViewTest(TestCase):
         score_second = Score(person=people[1], dimension=dimension_two, value=5)
         score_second.save()
 
-        response = client.get("/", {'topic_dimension_eq' : 'dimension_one'})
+        response = client.get("/", {f'topic_dimension_eq_{circle.id}' : dimension_one.id})
         self.assertContains(response, "topic : 1")
 
     def test_index_add_expected_context(self):
         create_sample_with_score_values([1, 1, 0, 1])
-        index = IndexView()
         topics_names = ["topic0","topic1","topic2","topic3"]
+        self.factory = RequestFactory()
+        request = self.factory.get('/')
+        index = IndexView()
+        index.setup(request)
 
         context = index.add_cirles_context({})
         self.assertNotEqual(context.get('circles'),None)

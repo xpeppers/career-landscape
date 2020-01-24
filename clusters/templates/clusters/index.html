@@ -17,7 +17,6 @@
 
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-
 </head>
 
 <body>
@@ -35,90 +34,86 @@
     </div>
   </nav>
 
-  <div class='container-fluid'>
-
+  <div class='container-fluid clearfix'>
     <hr>
-
     {% if circles %}
     <form action="{% url 'clusters:index' %}" method="get">
       {% for circle_name, context in circles.items %}
-      {% with topics_details=context.topics_details dimensions=context.dimensions circle_id=context.circle_id topic_value_gt=context.topic_value_gt topic_dimension_eq=context.topic_dimension_eq%}
-      <div class='row'>
-        <div class='col-md-4'>
+        {% with circle_id=context.circle_id topics_details=context.topics_details dimensions=context.dimensions topic_value_gt=context.topic_value_gt topic_dimension_eq=context.topic_dimension_eq%}
+        <div class='row p-4'>
+          <div class='col-md-4'>
 
-          <div class="card" style="width: 18rem;">
-            <div class="card-body">
-              <h4 class="card-title title">{{circle_name}} Circle</h4>
-              <h5 class="card-subtitle mb-2 text-muted">Topics:</h5>
-              <p class="card-text">Here the Delivery Circle description.</p>
-              {% if topics_details %}
-              <ul>
-                {% for name, number in topics_details.items %}
-                <h6>
-                  <li>{{name}} : {{number}} </li>
-                </h6>
-                {% endfor %}
-              </ul>
-              {% with get_param=request.GET %}
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h3 class="card-title title">{{circle_name}} Circle</h3>
+                <h4 class="card-subtitle mb-2 text-muted">Topics:</h4>
+                <p class="card-text">Here the {{circle_name}} Circle description.</p>
+                {% if topics_details %}
+                  <ul>
+                    {% for name, number in topics_details.items %}
+                      <h6>
+                        <li>{{name}} : {{number}} </li>
+                      </h6>
+                    {% endfor %}
+                  </ul>
+                  <hr>
+                  <div class="form-group">
+                    <label for="topic_value_gt_{{circle_id}}">Value Filter</label>
+                    {% if topic_value_gt %}
+                      <p> Value Filter Setted: > {{ topic_value_gt }} </p>
+                    {% endif %}
+                    <select class="form-control" name="topic_value_gt_{{circle_id}}" id="topic_value_gt_{{circle_id}}">
+                      {% for i in '01234'|make_list %}
+                        {% if i == topic_value_gt %}
+                          <option selected='selected' value={{ i }}> > {{ i }}</option>
+                        {% else %}
+                          <option value={{ i }}> > {{ i }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    <label for="topic_dimension_eq">Dimension Filter</label>
+                    {% if topic_dimension_eq %}
+                      <p> Dimension Filter Setted: {{ topic_dimension_eq }} </p>
+                    {% endif %}
+                    <select class="form-control" name="topic_dimension_eq_{{circle_id}}" id="topic_dimension_eq_{{circle_id}}">
+                      <option value="-1"> All </option>
+                      {% for dimension in dimensions %}
+                        {% if dimension.name == topic_dimension_eq %}
+                          <option selected="selected" value="{{dimension.id}}"> {{dimension.name}} </option>
+                        {% else %}
+                          <option value="{{dimension.id}}"> {{dimension.name}} </option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
 
-              <div class="form-group">
-                <label for="topic_value_gt_{{circle_id}}">Value Filter</label>
-                {% if topic_value_gt %}
-                <p> Value Filter Setted: > {{ topic_value_gt }} </p>
+                  <input type="submit">
+                {% else %}
+                 <p>No Topics available.</p>
                 {% endif %}
-                <select class="form-control" name="topic_value_gt_{{circle_id}}" id="topic_value_gt_{{circle_id}}">
-                  {% for i in '01234'|make_list %}
-                  {% if i == topic_value_gt %}
-                  <option selected='selected' value={{ i }}> > {{ i }}</option>
-                  {% else %}
-                  <option value={{ i }}> > {{ i }}</option>
-                  {% endif %}
-                  {% endfor %}
-                </select>
               </div>
-              <hr>
-              <div class="form-group">
-                <label for="topic_dimension_eq">Dimension Filter</label>
-                {% if topic_dimension_eq %}
-                <p> Dimension Filter Setted: {{ topic_dimension_eq }} </p>
-                {% endif %}
-                <select class="form-control" name="topic_dimension_eq_{{circle_id}}"
-                  id="topic_dimension_eq_{{circle_id}}">
-                  <option value=""> All </option>
-                  {% for dimension in dimensions %}
-                  {% if dimension == topic_dimension_eq %}
-                  <option selected="selected" value={{dimension}}> {{dimension}} </option>
-                  {% else %}
-                  <option value={{dimension}}> {{dimension}} </option>
-                  {% endif %}
-                  {% endfor %}
-                </select>
-              </div>
-              <input type="submit">
-
-              {% endwith %}
-              {% else %}
-              <p>No Topics available.</p>
-              {% endif %}
             </div>
           </div>
+          <div class='col-md-8'>
+            <div class='ml-5 media' id="{{circle_name}}" style="width:500px;height:500px;"></div>
+          </div>
         </div>
-        <div class='col-md-8'>
-          <div class='media' id="{{circle_name}}" style="width:500px;height:500px;"></div>
-        </div>
-      </div>
-      {% endwith %}
+        <hr>
+        {% endwith %}
       {% endfor %}
     </form>
     {% else %}
-    <p>No Circle available.</p>
+      <p>No Circle available.</p>
     {% endif %}
   </div>
 
 
   <footer id="sticky-footer" class="py-4 bg-dark text-white-50" style="margin-top:40px">
     <div class="container text-center">
-      <small>Copyright &copy; <p class="title">Career Landscape</p></small>
+      <small>Copyright &copy; <p class="title">XPeppers</p></small>
     </div>
   </footer>
 
@@ -128,15 +123,16 @@
 
     for (var circle in context) {
       let circle_context = context[circle];
-      let topics_details = circle_context['topics_details'];
-      let max_range = Math.max(...(Object.values(topics_details)));
+      let topics_details_tuples = circle_context['topics_details'];
+      let topics_details = Object.keys(topics_details_tuples);
+      let max_range = Math.max(...(Object.values(topics_details_tuples)));
 
       console.log(circle_context)
 
       data = [{
         type: 'scatterpolar',
-        r: Object.values(topics_details),
-        theta: Object.keys(topics_details),
+        r: Object.values(topics_details_tuples),
+        theta: topics_details,
         fill: 'toself'
       }];
 
