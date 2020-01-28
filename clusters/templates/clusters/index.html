@@ -126,14 +126,16 @@
       let topics_details_tuples = circle_context['topics_details'];
       let topics_details = Object.keys(topics_details_tuples);
       let max_range = Math.max(...(Object.values(topics_details_tuples)));
+      let tooltip = topics_details.map( name => name+" : "+topics_details_tuples[name] )
 
-      console.log(circle_context)
 
       data = [{
         type: 'scatterpolar',
         r: Object.values(topics_details_tuples),
         theta: topics_details,
-        fill: 'toself'
+        fill: 'toself',
+        hovertext: tooltip,
+        hoverinfo:"text",
       }];
 
       layout = {
