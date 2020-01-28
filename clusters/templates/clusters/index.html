@@ -3,166 +3,219 @@
 {% load static %}
 
 <html lang="en">
+  <head>
+    <title>Clusters</title>
 
-<head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
+    <meta name="description" content="clusters">
 
-  <title>Clusters</title>
-  <meta name="description" content="clusters">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    >
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Dosis|Kaushan+Script&display=swap"
+    >
+    <link
+      rel="stylesheet"
+      href="{% static "clusters/css/style.css" %}"
+    >
 
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css?family=Dosis|Kaushan+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static "clusters/css/style.css" %}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
 
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-</head>
-
-<body>
-
-  <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand title" href="{% url 'clusters:index' %}">Career Landscape</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-item nav-link active" href="#">About <span class="sr-only">(current)</span></a>
+  <body>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand title" href="{% url 'clusters:index' %}">
+        Career Landscape
+      </a>
+      <button class="navbar-toggler" type="button"
+        data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active" href="#">
+            About <span class="sr-only">(current)</span>
+          </a>
+        </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-  <div class='container-fluid clearfix'>
-    <hr>
-    {% if circles %}
-    <form action="{% url 'clusters:index' %}" method="get">
-      {% for circle_name, context in circles.items %}
-        {% with circle_id=context.circle_id topics_details=context.topics_details dimensions=context.dimensions topic_value_gt=context.topic_value_gt topic_dimension_eq=context.topic_dimension_eq%}
-        <div class='row p-4'>
-          <div class='col-md-4'>
-
-            <div class="card" style="width: 18rem;">
-              <div class="card-body">
-                <h3 class="card-title title">{{circle_name}} Circle</h3>
-                <h4 class="card-subtitle mb-2 text-muted">Topics:</h4>
-                <p class="card-text">Here the {{circle_name}} Circle description.</p>
-                {% if topics_details %}
-                  <ul>
-                    {% for name, number in topics_details.items %}
-                      <h6>
-                        <li>{{name}} : {{number}} </li>
-                      </h6>
-                    {% endfor %}
-                  </ul>
-                  <hr>
-                  <div class="form-group">
-                    <label for="topic_value_gt_{{circle_id}}">Value Filter</label>
-                    {% if topic_value_gt %}
-                      <p> Value Filter Setted: > {{ topic_value_gt }} </p>
-                    {% endif %}
-                    <select class="form-control" name="topic_value_gt_{{circle_id}}" id="topic_value_gt_{{circle_id}}">
-                      {% for i in '01234'|make_list %}
-                        {% if i == topic_value_gt %}
-                          <option selected='selected' value={{ i }}> > {{ i }}</option>
-                        {% else %}
-                          <option value={{ i }}> > {{ i }}</option>
+    <div class='container-fluid clearfix'>
+      <hr>
+      {% if circles %}
+        <form action="{% url 'clusters:index' %}" method="get">
+          {% for circle_name, context in circles.items %}
+            {% with circle_id=context.circle_id topics_details=context.topics_details dimensions=context.dimensions topic_value_gt=context.topic_value_gt topic_dimension_eq=context.topic_dimension_eq%}
+            <div class='row p-4'>
+              <div class='col-md-4'>
+                <div class="card" style="width: 18rem;">
+                  <div class="card-body">
+                    <h3 class="card-title title">
+                      {{ circle_name }} Circle
+                    </h3>
+                    <h4 class="card-subtitle mb-2 text-muted">
+                      Topics:
+                    </h4>
+                    <p class="card-text">
+                      Here the {{ circle_name }} Circle description.
+                    </p>
+                    {% if topics_details %}
+                      <ul>
+                        {% for name, number in topics_details.items %}
+                          <h6>
+                            <li>{{ name }} : {{ number }}</li>
+                          </h6>
+                        {% endfor %}
+                      </ul>
+                      <hr>
+                      <div class="form-group">
+                        <label for="topic_value_gt_{{ circle_id }}">
+                          Value Filter
+                        </label>
+                        {% if topic_value_gt %}
+                          <p>Value Filter Setted: > {{ topic_value_gt }}</p>
                         {% endif %}
-                      {% endfor %}
-                    </select>
-                  </div>
-                  <hr>
-                  <div class="form-group">
-                    <label for="topic_dimension_eq">Dimension Filter</label>
-                    {% if topic_dimension_eq %}
-                      <p> Dimension Filter Setted: {{ topic_dimension_eq }} </p>
-                    {% endif %}
-                    <select class="form-control" name="topic_dimension_eq_{{circle_id}}" id="topic_dimension_eq_{{circle_id}}">
-                      <option value="-1"> All </option>
-                      {% for dimension in dimensions %}
-                        {% if dimension.name == topic_dimension_eq %}
-                          <option selected="selected" value="{{dimension.id}}"> {{dimension.name}} </option>
-                        {% else %}
-                          <option value="{{dimension.id}}"> {{dimension.name}} </option>
+                        <select
+                          class="form-control"
+                          name="topic_value_gt_{{ circle_id }}"
+                          id="topic_value_gt_{{ circle_id }}"
+                        >
+                          {% for topic_value in '01234'|make_list %}
+                            {% if topic_value == topic_value_gt %}
+                              <option selected='selected' value={{ topic_value }}>
+                                > {{ topic_value }}
+                              </option>
+                            {% else %}
+                              <option value={{ topic_value }}>
+                                > {{ topic_value }}
+                              </option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <hr>
+                      <div class="form-group">
+                        <label for="topic_dimension_eq">
+                          Dimension Filter
+                        </label>
+                        {% if topic_dimension_eq %}
+                          <p>Dimension Filter Setted: {{ topic_dimension_eq }}</p>
                         {% endif %}
-                      {% endfor %}
-                    </select>
-                  </div>
+                        <select
+                          class="form-control"
+                          name="topic_dimension_eq_{{ circle_id }}"
+                          id="topic_dimension_eq_{{ circle_id }}"
+                        >
+                          <option value="-1">All</option>
+                          {% for dimension in dimensions %}
+                            {% if dimension.name == topic_dimension_eq %}
+                              <option selected="selected" value="{{ dimension.id }}">
+                                {{ dimension.name }}
+                              </option>
+                            {% else %}
+                              <option value="{{ dimension.id }}">
+                                {{ dimension.name }}
+                              </option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      </div>
 
-                  <input type="submit">
-                {% else %}
-                 <p>No Topics available.</p>
-                {% endif %}
+                      <input type="submit">
+                    {% else %}
+                      <p>No Topics available.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class='col-md-8'>
+                <div
+                  class='ml-5 media'
+                  id="{{ circle_name }}"
+                  style="width:500px;height:500px;"
+                ></div>
               </div>
             </div>
-          </div>
-          <div class='col-md-8'>
-            <div class='ml-5 media' id="{{circle_name}}" style="width:500px;height:500px;"></div>
-          </div>
-        </div>
-        <hr>
-        {% endwith %}
-      {% endfor %}
-    </form>
-    {% else %}
-      <p>No Circle available.</p>
-    {% endif %}
-  </div>
-
-
-  <footer id="sticky-footer" class="py-4 bg-dark text-white-50" style="margin-top:40px">
-    <div class="container text-center">
-      <small>Copyright &copy; <p class="title">XPeppers</p></small>
+            <hr>
+            {% endwith %}
+          {% endfor %}
+        </form>
+      {% else %}
+        <p>No Circle available.</p>
+      {% endif %}
     </div>
-  </footer>
 
-  <script>
-    let context_rep = "{{circles}}".replace(/&#x27;/gi, '"');
-    const context = JSON.parse(context_rep);
+    <footer
+      id="sticky-footer"
+      class="py-4 bg-dark text-white-50"
+      style="margin-top:40px"
+    >
+      <div class="container text-center">
+        <small>
+          Copyright &copy; <span class="title">XPeppers, a Claranet Group Company</span>
+        </small>
+      </div>
+    </footer>
 
-    for (var circle in context) {
-      let circle_context = context[circle];
-      let topics_details_tuples = circle_context['topics_details'];
-      let topics_details = Object.keys(topics_details_tuples);
-      let max_range = Math.max(...(Object.values(topics_details_tuples)));
-      let tooltip = topics_details.map( name => name+" : "+topics_details_tuples[name] )
+    {{ circles|json_script:"circles-json-data" }}
+    <script>
+      const context = JSON.parse(
+        document.getElementById("circles-json-data").textContent
+      );
 
+      for (const circle in context) {
+        let topics_details = context[circle]['topics_details'];
+        let topics_names = Object.keys(topics_details);
+        let max_range = Math.max(...(Object.values(topics_details))) + 1;
+        let tooltip = topics_details.map(name =>
+          name + " : " + topics_details_tuples[name]
+        )
 
-      data = [{
-        type: 'scatterpolar',
-        r: Object.values(topics_details_tuples),
-        theta: topics_details,
-        fill: 'toself',
-        hovertext: tooltip,
-        hoverinfo:"text",
-      }];
+        data = [{
+          type: 'scatterpolar',
+          r: Object.values(topics_details),
+          theta: topics_names,
+          fill: 'toself',
+          hovertext: tooltip,
+          hoverinfo: "text",
+        }];
 
-      layout = {
-        polar: {
-          radialaxis: {
-            visible: true,
-            range: [0, max_range + 1],
-            dtick: 1
-          }
-        },
-        showlegend: false
-      };
+        layout = {
+          polar: {
+            radialaxis: {
+              visible: true,
+              range: [0, max_range],
+              dtick: 1
+            }
+          },
+          showlegend: false
+        };
 
-      Plotly.plot(document.getElementById(circle), data, layout);
-
-    }
-  </script>
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-    crossorigin="anonymous"></script>
-</body>
-
-
+        Plotly.plot(document.getElementById(circle), data, layout);
+      }
+    </script>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
