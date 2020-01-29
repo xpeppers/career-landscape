@@ -12,7 +12,7 @@ def create_sample_with_score_values(values):
     circle = CircleFactory.create(name='circle')
     person = UserFactory.build()
     person.save()
-    topics = [TopicFactory.create(name=f'topic{n}', circle=circle) for n in range(len(values)) ]
+    topics = [ TopicFactory.create(name=f'topic{n}', circle=circle) for n in range(len(values)) ]
     dimensions = [ DimensionFactory.create(topic=a_topic) for a_topic in topics ]
     scores = [ ScoreFactory.create(person=person, dimension=dimensions[i], value=values[i]) for i in range(len(values)) ]
 

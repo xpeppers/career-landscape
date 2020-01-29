@@ -11,6 +11,9 @@ coverage = "*"
 django = "*"
 psycopg2-binary = "*"
 factory-boy = "*"
+pandas = "*"
+xlrd = "*"
+django-excel = "*"
 
 [requires]
 python_version = "3.8"

@@ -1,11 +1,12 @@
 from django.test import RequestFactory, TestCase, Client
 from django.db.utils import IntegrityError
 from django.contrib.auth.models import User
+import pandas
 
 from clusters.tests.factories.factory_methods import *
 
 from clusters.models import Circle, Topic, Dimension, Score
-from clusters.views import IndexView
+from clusters.views import IndexView, uploadFile, parse_xlsx
 from  clusters.tests.factories.circle import CircleFactory
 from  clusters.tests.factories.topic import TopicFactory
 from  clusters.tests.factories.dimension import DimensionFactory
@@ -166,7 +167,37 @@ class IndexViewTest(TestCase):
         self.assertContains(response, f'{first_circle_topic.name} : 0')
         self.assertContains(response, f'{second_circle_topic.name} : 1')
 
+    def test_parse_xlsx_correct_import_datas_from_dataframe(self):
+        myfile = pandas.read_excel('clusters/tests/test_models/excel_test_file/cl_example.xlsx', header=None, index_col=False)
+        circle = CircleFactory.create()
 
+        result = parse_xlsx(myfile)
+        expected_result = { 'user_name' : 'user_name', 'user_surname' : 'user_surname', 'circles' : [[
+            ('Circle','topic1','dimension1',2),
+            ('Circle','topic1','dimension2',1),
+            ('Circle','topic1','dimension3',2),
+            ('Circle','topic1','dimension4',1),
+            ('Circle','topic2','dimension1',4),
+            ('Circle','topic2','dimension2',4),
+            ('Circle','topic2','dimension3',4),
+            ('Circle','topic2','dimension4',4) ]] }
 
+        self.assertEqual(result['user_name'],expected_result['user_name'])
+        self.assertEqual(result['user_surname'],expected_result['user_surname'])
+        self.assertListEqual(result['circles'],expected_result['circles'])
 
+    def test_index_upload_xlsx_file_and_load_data(self):
+        client = Client()
+        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user.save()
+        circle = CircleFactory.create(name='Circle')
+        topics = [ TopicFactory.create(name=f"topic{i}", circle=circle) for i in range(1,3) ]
+        dimension_topic_1 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[0]) for i in range(1,5) ]
+        dimension_topic_2 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[1]) for i in range(1,5) ]
+        myfile = pandas.read_excel('clusters/tests/test_models/excel_test_file/cl_example.xlsx', header=None, index_col=False)
 
+        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
+            response = client.post('/uploadFile/',{ 'title' : 'cl_example' , 'file' : xlsx_file })
+
+        scores = Score.objects.all()
+        self.assertEqual(len(scores),8)

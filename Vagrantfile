@@ -97,4 +97,7 @@ Vagrant.configure("2") do |config|
     ansible.verbose = true
     ansible.extra_vars = load_properties('.env')
   end
+
+  config.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Europe/Rome /etc/localtime", run: "always"
+
 end

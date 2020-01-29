@@ -53,7 +53,6 @@
       {% if circles %}
         <form action="{% url 'clusters:index' %}" method="get">
           {% for circle_name, context in circles.items %}
-            {% with circle_id=context.circle_id topics_details=context.topics_details dimensions=context.dimensions topic_value_gt=context.topic_value_gt topic_dimension_eq=context.topic_dimension_eq%}
             <div class='row p-4'>
               <div class='col-md-4'>
                 <div class="card" style="width: 18rem;">
@@ -67,9 +66,9 @@
                     <p class="card-text">
                       Here the {{ circle_name }} Circle description.
                     </p>
-                    {% if topics_details %}
+                    {% if context.topics_details %}
                       <ul>
-                        {% for name, number in topics_details.items %}
+                        {% for name, number in context.topics_details.items %}
                           <h6>
                             <li>{{ name }} : {{ number }}</li>
                           </h6>
@@ -77,19 +76,19 @@
                       </ul>
                       <hr>
                       <div class="form-group">
-                        <label for="topic_value_gt_{{ circle_id }}">
+                        <label for="topic_value_gt_{{ context.circle_id }}">
                           Value Filter
                         </label>
-                        {% if topic_value_gt %}
-                          <p>Value Filter Setted: > {{ topic_value_gt }}</p>
+                        {% if context.topic_value_gt %}
+                          <p>Value Filter Setted: > {{ context.topic_value_gt }}</p>
                         {% endif %}
                         <select
                           class="form-control"
-                          name="topic_value_gt_{{ circle_id }}"
-                          id="topic_value_gt_{{ circle_id }}"
+                          name="topic_value_gt_{{ context.circle_id }}"
+                          id="topic_value_gt_{{ context.circle_id }}"
                         >
                           {% for topic_value in '01234'|make_list %}
-                            {% if topic_value == topic_value_gt %}
+                            {% if topic_value == context.topic_value_gt %}
                               <option selected='selected' value={{ topic_value }}>
                                 > {{ topic_value }}
                               </option>
@@ -106,17 +105,17 @@
                         <label for="topic_dimension_eq">
                           Dimension Filter
                         </label>
-                        {% if topic_dimension_eq %}
-                          <p>Dimension Filter Setted: {{ topic_dimension_eq }}</p>
+                        {% if context.topic_dimension_eq %}
+                          <p>Dimension Filter Setted: {{ context.topic_dimension_eq }}</p>
                         {% endif %}
                         <select
                           class="form-control"
-                          name="topic_dimension_eq_{{ circle_id }}"
-                          id="topic_dimension_eq_{{ circle_id }}"
+                          name="topic_dimension_eq_{{ context.circle_id }}"
+                          id="topic_dimension_eq_{{ context.circle_id }}"
                         >
                           <option value="-1">All</option>
-                          {% for dimension in dimensions %}
-                            {% if dimension.name == topic_dimension_eq %}
+                          {% for dimension in context.dimensions %}
+                            {% if dimension.name == context.topic_dimension_eq %}
                               <option selected="selected" value="{{ dimension.id }}">
                                 {{ dimension.name }}
                               </option>
@@ -145,12 +144,23 @@
               </div>
             </div>
             <hr>
-            {% endwith %}
           {% endfor %}
         </form>
       {% else %}
         <p>No Circle available.</p>
       {% endif %}
+
+      <div class="row">
+        <div class="col-md-12">
+          <form action="{% url 'clusters:uploadFile' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Upload">
+        </form>
+        </div>
+      </div>
+
+
     </div>
 
     <footer
@@ -175,8 +185,8 @@
         let topics_details = context[circle]['topics_details'];
         let topics_names = Object.keys(topics_details);
         let max_range = Math.max(...(Object.values(topics_details))) + 1;
-        let tooltip = topics_details.map(name =>
-          name + " : " + topics_details_tuples[name]
+        let tooltip = topics_names.map(
+          name => name + " : " + topics_details[name]
         )
 
         data = [{

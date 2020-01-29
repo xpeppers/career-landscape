@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+import pytz
 
 
 class Circle(models.Model):
@@ -38,6 +40,7 @@ class Score(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE)
     dimension = models.ForeignKey(Dimension, on_delete=models.CASCADE)
     value = models.IntegerField(default=0)
+    date = models.DateTimeField(default=timezone.now, blank=True)
 
     def __repr__(self):
         return f"{self.person} has assigned {self.value} in {self.dimension}"
