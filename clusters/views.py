@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse
@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 import pandas as pd
 from datetime import datetime
 from django.utils import timezone
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.contrib import messages
 
 from .forms import UploadFileForm
 from .models import Circle, Topic, Dimension, Score
@@ -19,7 +21,6 @@ class IndexView(generic.FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = self.add_cirles_context(context)
-
         return context
 
     def add_cirles_context(self, context):
@@ -62,54 +63,106 @@ class IndexView(generic.FormView):
             .count()
         )
 
+
+
 def uploadFile(request):
-    if request.method == "POST":
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            filehandle = request.FILES['file']
-            xlsx = filehandle.file
-            myfile = pd.read_excel(xlsx, header=None, index_col=False)
-            parsed_data = parse_xlsx(myfile)
-            add_xlsx_datas(parsed_data)
-        else:
-            print('Error in form is valid')
-    else:
-        print('no post method find')
-    return HttpResponseRedirect(reverse('clusters:index'))
+    if request.method != "POST":
+        messages.error(request, 'Form fail in sending file')
+        return redirect('/')
+    if not UploadFileForm(request.POST, request.FILES).is_valid():
+        messages.error(request, 'Form is not Valid')
+        return redirect('/')
+    myfile = safe_read_excel(request.FILES['file'].file)
+    if myfile is None:
+        messages.error(request,'File reading generate error: please check file format.')
+        return redirect('/')
+    parsed_data = parse_xlsx(myfile)
+    if not parsed_data:
+        messages.error(request, 'Xlsx File has incorrect format! Impossible to Proceed.')
+        return redirect('/')
+    success, message = add_xlsx_datas(parsed_data)
+    if not success:
+        messages.error(request, message)
+        return redirect('/')
+    messages.success(request, message)
+    return redirect('/')
+
+
+def safe_read_excel(file):
+    try:
+        return pd.read_excel(file, header=None, index_col=False)
+    except Exception:
+        return None
 
 def add_xlsx_datas(parsed_data):
-    user_name = parsed_data['user_name']
-    user_surname = parsed_data['user_surname']
-    date = parsed_data['compilation_data']
-    timed_data = datetime.strptime(date, "%d-%m-%Y")
+    user_and_data, error_message =  get_user_and_date(parsed_data)
+    if not user_and_data:
+        return (False, f'Error in xlsx file datas: {error_message}')
 
-    person = User.objects.get(first_name=user_name, last_name=user_surname)
+    timed_date = user_and_data['timed_date']
+    person = user_and_data['person']
     circles = parsed_data['circles']
-
+    if not circles:
+        return (False, "No database Circle detected. Impossible to Proceed.")
     for circle in circles:
         for circle_name, topic_name, dimension_name, value in circle:
-            circle = Circle.objects.get(name=circle_name)
-            topic = Topic.objects.get(circle= circle, name=topic_name)
-            dimension = Dimension.objects.get(topic=topic, name=dimension_name)
-            score = Score(dimension=dimension, person=person, value=value, date=timed_data)
+            dimension, error_message = get_score_context(circle_name, topic_name, dimension_name)
+            if dimension is None:
+                return (False, f'Consistency Error: {error_message}')
+            score = Score(dimension=dimension, person=person, value=value, date=timed_date)
             score.save()
+    return (True, 'Upload Success!')
+
+def get_user_and_date(parsed_data):
+    try:
+        date = parsed_data['compilation_date']
+        timed_data = datetime.strptime(date, "%d-%m-%Y")
+        user_name = parsed_data['user_name']
+        user_surname = parsed_data['user_surname']
+        person = User.objects.get(first_name=user_name, last_name=user_surname)
+        return ({ 'timed_date': timed_data, 'person': person }, '')
+    except ValueError as _:
+        return ({}, 'Data not correct ( correct data format: dd-mm-yyyy ) ')
+    except ObjectDoesNotExist as _:
+        return ({}, f'User not registered! First add User {user_name} {user_surname} in database.')
+    except MultipleObjectsReturned as _:
+        return ({}, f'Multiple User with same First-Name and Last-Name ({user_name} {user_surname}): Consistency Error!')
+    except Exception as _:
+        return ({}, 'Unknown Error Occurred during User and Date evaluation.')
+
+def get_score_context(circle_name, topic_name, dimension_name):
+    try:
+        circle = Circle.objects.get(name=circle_name)
+        topic = Topic.objects.get(circle= circle, name=topic_name)
+        dimension = Dimension.objects.get(topic=topic, name=dimension_name)
+        return (dimension, '')
+    except Circle.DoesNotExist as _ :
+        return (None, f'Circle <{circle_name}> in xlsx file does not exists!')
+    except Topic.DoesNotExist as _ :
+        return (None, f'Topic <{topic_name}> in xlsx file does not exists!')
+    except Dimension.DoesNotExist as _ :
+        return (None, f'Dimension <{dimension_name}> in xlsx file does not exists!')
+    except Exception as _:
+        return (None, 'Unknown Error Occurred during xlsx data acquisition.')
 
 
 def parse_xlsx(dataframe):
-    n_tables = len(Circle.objects.all())
-    user_name = dataframe.iloc[1,1]
-    user_surname = dataframe.iloc[1,2]
-    compilation_data = dataframe.iloc[1,3]
-    dataframe = dataframe[3:]
-    circles = []
-    lines_of_table = 7
-    table_index = 0
-    for _ in range(n_tables):
-        sub_dataframe = dataframe[table_index:table_index + lines_of_table]
-        circles.append( parse_circle(sub_dataframe) )
-        table_index = table_index + lines_of_table
-    return {'user_name': user_name, 'user_surname': user_surname, 'compilation_data' : compilation_data, 'circles': circles }
-
+    try:
+        n_tables = len(Circle.objects.all())
+        user_name = dataframe.iloc[1,1]
+        user_surname = dataframe.iloc[1,2]
+        compilation_date = dataframe.iloc[1,3]
+        dataframe = dataframe[3:]
+        circles = []
+        lines_of_table = 7
+        table_index = 0
+        for _ in range(n_tables):
+            sub_dataframe = dataframe[table_index:table_index + lines_of_table]
+            circles.append( parse_circle(sub_dataframe) )
+            table_index = table_index + lines_of_table
+        return {'user_name': user_name, 'user_surname': user_surname, 'compilation_date' : compilation_date, 'circles': circles }
+    except IndexError as ie:
+        return {}
 
 def parse_circle(dataframe):
     lines = []

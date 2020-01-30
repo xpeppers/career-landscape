@@ -1,6 +1,7 @@
 from django.test import RequestFactory, TestCase, Client
 from django.db.utils import IntegrityError
 from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
 import pandas
 
 from clusters.tests.factories.factory_methods import *
@@ -188,16 +189,67 @@ class IndexViewTest(TestCase):
 
     def test_index_upload_xlsx_file_and_load_data(self):
         client = Client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
-        user.save()
-        circle = CircleFactory.create(name='Circle')
-        topics = [ TopicFactory.create(name=f"topic{i}", circle=circle) for i in range(1,3) ]
-        dimension_topic_1 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[0]) for i in range(1,5) ]
-        dimension_topic_2 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[1]) for i in range(1,5) ]
-        myfile = pandas.read_excel('clusters/tests/test_models/excel_test_file/cl_example.xlsx', header=None, index_col=False)
+        create_example_excel_file_context()
 
         with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/uploadFile/',{ 'title' : 'cl_example' , 'file' : xlsx_file })
+            response = client.post('/uploadFile/',{ 'file' : xlsx_file })
 
         scores = Score.objects.all()
         self.assertEqual(len(scores),8)
+
+    def test_index_view_shows_correct_upload_file_message_if_success(self):
+        client = Client()
+        xlsx_file = create_example_excel_file_context()
+
+        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
+            response = client.post('/uploadFile/', { 'file' : xlsx_file })
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Upload Success!')
+
+    def test_index_view_shows_correct_upload_file_message_if_fail_with_wrong_file_post(self):
+        client = Client()
+        xlsx_file = 'false_file'
+        response = client.post('/uploadFile/', { 'file' : xlsx_file })
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Form is not Valid')
+
+
+    def test_index_view_upload_file_with_not_registered_user_shows_error_message(self):
+        client = Client()
+
+        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
+            response = client.post('/uploadFile/', { 'file' : xlsx_file })
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: User not registered! First add User user_name user_surname in database.')
+
+    def test_index_view_upload_file_with_no_circle_in_db_shows_error_message(self):
+        client = Client()
+        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user.save()
+
+        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
+            response = client.post('/uploadFile/', { 'file' : xlsx_file })
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'No database Circle detected. Impossible to Proceed.')
+
+    def test_index_view_upload_file_with_not_registered_data_shows_error_message(self):
+        client = Client()
+        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user.save()
+        circle = CircleFactory.create(name='Circle')
+
+        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
+            response = client.post('/uploadFile/', { 'file' : xlsx_file })
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Consistency Error: Topic <topic1> in xlsx file does not exists!')
+

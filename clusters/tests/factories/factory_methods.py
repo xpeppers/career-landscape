@@ -1,5 +1,6 @@
 from clusters.models import Circle, Topic, Dimension, Score
 from django.contrib.auth.models import User
+import pandas
 
 from .circle import CircleFactory
 from .topic import TopicFactory
@@ -24,3 +25,11 @@ def create_users(number):
         user.save()
         people.append(user)
     return people
+
+def create_example_excel_file_context():
+    user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+    user.save()
+    circle = CircleFactory.create(name='Circle')
+    topics = [ TopicFactory.create(name=f"topic{i}", circle=circle) for i in range(1,3) ]
+    dimension_topic_1 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[0]) for i in range(1,5) ]
+    dimension_topic_2 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[1]) for i in range(1,5) ]
