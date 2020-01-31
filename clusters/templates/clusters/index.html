@@ -75,14 +75,18 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-12">
-          <form action="{% url 'clusters:uploadFile' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Upload">
-         </form>
+      <div class="row p-4">
+        <div class="col-md-4">
+          <div class="card p-3 upload" style="width: 18rem;">
+            <h4 class="card-title mb-2"> Upload .xlsx File Panel </h4>
+            <form action="{% url 'clusters:index' %}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form }}
+              <br><br><input class="float-right" type="submit" value="Upload">
+            </form>
+          </div>
         </div>
+        <div class="col-md-8"></div>
       </div>
 
       <hr>

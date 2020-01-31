@@ -29,7 +29,7 @@ Development setup, run these commands:
 vagrant up
 vagrant ssh
 cd /vagrant/
-pipenv install
+pipenv install --dev
 pipenv shell
 python3 manage.py migrate
 python3 manage.py createsuperuser

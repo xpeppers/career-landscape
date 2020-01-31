@@ -3,6 +3,12 @@
     margin: 5auto;
 }
 
+.card.upload {
+    background-color:rgba(70, 131, 180, 0.500);
+    border-width: 2px;
+    border-color: steelblue;
+}
+
 p {
     font-family: 'Dosis', sans-serif;
 }
