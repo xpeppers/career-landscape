@@ -2,7 +2,6 @@ from django.test import RequestFactory, TestCase, Client
 from django.db.utils import IntegrityError
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
-import pandas
 
 from clusters.tests.factories.factory_methods import *
 
@@ -12,26 +11,20 @@ from clusters.tests.factories.circle import CircleFactory
 from clusters.tests.factories.topic import TopicFactory
 from clusters.tests.factories.dimension import DimensionFactory
 
+class MockListener:
+    def uploadSuccessful(self, message):
+        return
+
+    def dataNotParsed(self):
+        return
+
+    def badFileFormat(self):
+        return
+
+    def uploadUnsuccessful(self, message):
+        return
 
 class ManageViewTest(TestCase):
-    def test_parse_xlsx_correct_import_datas_from_dataframe(self):
-        myfile = pandas.read_excel('clusters/tests/test_models/excel_test_file/cl_example.xlsx', header=None, manage_col=False)
-        circle = CircleFactory.create()
-
-        result = ManageView().parse_xlsx(myfile)
-        expected_result = { 'user_name' : 'user_name', 'user_surname' : 'user_surname', 'circles' : [[
-            ('Circle','topic1','dimension1',2),
-            ('Circle','topic1','dimension2',1),
-            ('Circle','topic1','dimension3',2),
-            ('Circle','topic1','dimension4',1),
-            ('Circle','topic2','dimension1',4),
-            ('Circle','topic2','dimension2',4),
-            ('Circle','topic2','dimension3',4),
-            ('Circle','topic2','dimension4',4) ]] }
-
-        self.assertEqual(result['user_name'],expected_result['user_name'])
-        self.assertEqual(result['user_surname'],expected_result['user_surname'])
-        self.assertListEqual(result['circles'],expected_result['circles'])
 
     def test_manage_upload_xlsx_file_and_load_data(self):
         client = get_logged_client()
@@ -72,7 +65,7 @@ class ManageViewTest(TestCase):
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: User not registered! First add User user_name user_surname in database.')
+        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: User error: User not Found or multiple user with same first name and last name')
 
     def test_manage_view_upload_file_with_no_circle_in_db_shows_error_message(self):
         client = get_logged_client()
@@ -141,7 +134,7 @@ class ManageViewTest(TestCase):
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: Multiple User with same First-Name and Last-Name (user_name user_surname): Consistency Error!')
+        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: User error: User not Found or multiple user with same first name and last name')
 
     def test_manage_view_upload_with_bad_circle_in_excel(self):
         client = get_logged_client()
@@ -171,12 +164,12 @@ class ManageViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Consistency Error: Dimension <dimension1> in xlsx file does not exists!')
 
-    def test_manage_view_shows_users_form(self):
-        client = get_logged_client()
-        users = [ UserFactory.build(username= f'username{i}', password = f'blabla{i}') for i in range(3)]
-        map( lambda f : f.save(), users)
+    # def test_manage_view_shows_users_form(self):
+    #     client = get_logged_client()
+    #     users = [ UserFactory.build(username= f'username{i}', password = f'blabla{i}') for i in range(3)]
+    #     map( lambda f : f.save(), users)
 
-        response = client.get('/manage/')
+    #     response = client.get('/manage/')
 
-        for i in range(3):
-            self.assertContains(response, f'username{i}')
+    #     for i in range(3):
+    #         self.assertContains(response, f'username{i}')
