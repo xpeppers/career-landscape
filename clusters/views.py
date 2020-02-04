@@ -43,8 +43,8 @@ class ManageView(generic.FormView):
         messages.error(self.request, 'File in Upload Form is not Valid')
         return super(ManageView, self).form_invalid(form)
 
-    def uploadSuccessful(self, message):
-        messages.success(self.request, message)
+    def uploadSuccessful(self):
+        messages.success(self.request, 'Upload Success!')
 
     def dataNotParsed(self):
         messages.error(self.request, 'Xlsx File has incorrect format! Impossible to Proceed.')
@@ -52,8 +52,17 @@ class ManageView(generic.FormView):
     def badFileFormat(self):
         messages.error(self.request, 'File reading generate error: please check file format.')
 
-    def uploadUnsuccessful(self, message):
-        messages.error(self.request, message)
+    def noCircleInDatabase(self):
+        messages.error(self.request,'No database Circle detected. Impossible to Proceed.')
+
+    def userError(self):
+        messages.error(self.request, 'Error in xlsx file datas: User error: User not Found or multiple user with same first name and last name')
+
+    def dataError(self):
+        messages.error(self.request, 'Error in xlsx file datas: Data not correct ( correct data format: dd-mm-yyyy ) ')
+
+    def onDimensionRetrievalError(self, message):
+        messages.error(self.request, f'Consistency Error: {message} in xlsx file does not exists!')
 
 
 

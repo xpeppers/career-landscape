@@ -28,59 +28,43 @@ class ExcelUploadUseCase():
         if not parsed_data:
             self.listener.dataNotParsed()
             return
-        success, message = self.save_new_scores(parsed_data)
-        if not success:
-            self.listener.uploadUnsuccessful(message)
-            return
-        self.listener.uploadSuccessful(message)
-        return
+        self.save_new_scores(parsed_data)
+
 
     def save_new_scores(self, parsed_data):
-        user_and_data, error_message =  self.get_user_and_date(parsed_data)
-        if not user_and_data:
-            return (False, f'Error in xlsx file datas: {error_message}')
-        circles = parsed_data['circles']
-        if not circles:
-            return (False, "No database Circle detected. Impossible to Proceed.")
-        for circle in circles:
-            for circle_name, topic_name, dimension_name, value in circle:
-                dimension, error_message = self.get_dimension(circle_name, topic_name, dimension_name)
-                if dimension is None:
-                    return (False, f'Consistency Error: {error_message}')
-                self.score_repository.save_score(
-                    dimension=dimension,
-                    person=user_and_data['person'],
-                    value=value,
-                    date=user_and_data['timed_date'])
-        return (True, 'Upload Success!')
-
-    def get_user_and_date(self, parsed_data):
         try:
             date = datetime.strptime(parsed_data['compilation_date'], "%d-%m-%Y")
         except ValueError as _:
-            return ({}, 'Data not correct ( correct data format: dd-mm-yyyy ) ')
-        user_name = parsed_data['user_name']
-        user_surname = parsed_data['user_surname']
-        person = self.user_repository.get_user_by_first_name_and_last_name(user_name, user_surname)
+            self.listener.dataError()
+            return
+        person = self.user_repository.get_user_by_first_name_and_last_name(parsed_data['user_name'], parsed_data['user_surname'])
         if person is None:
-            return ({}, 'User error: User not Found or multiple user with same first name and last name')
-        return ({
-                    'timed_date': date,
-                    'person': person
-                },'')
-
-
-    def get_dimension(self, circle_name, topic_name, dimension_name):
-        circle = self.circle_repository.get_circle_by_name(circle_name)
-        if circle is None:
-            return (None, f'Circle <{circle_name}> in xlsx file does not exists!')
-        topic = self.topic_repository.get_topic_by_name_and_circle(topic_name, circle)
-        if topic is None:
-            return (None, f'Topic <{topic_name}> in xlsx file does not exists!')
-        dimension = self.dimension_repository.get_dimension_by_name_and_topic(dimension_name, topic)
-        if dimension is None:
-            return (None, f'Dimension <{dimension_name}> in xlsx file does not exists!')
-        return (dimension, "")
+            self.listener.userError()
+            return
+        circles = parsed_data['circles']
+        if not circles:
+            self.listener.noCircleInDatabase()
+            return
+        for circle in circles:
+            for circle_name, topic_name, dimension_name, value in circle:
+                circle = self.circle_repository.get_circle_by_name(circle_name)
+                if circle is None:
+                    self.listener.onDimensionRetrievalError(f'Circle <{circle_name}>')
+                    return
+                topic = self.topic_repository.get_topic_by_name_and_circle(topic_name, circle)
+                if topic is None:
+                    self.listener.onDimensionRetrievalError(f'Topic <{topic_name}>')
+                    return
+                dimension = self.dimension_repository.get_dimension_by_name_and_topic(dimension_name, topic)
+                if dimension is None:
+                    self.listener.onDimensionRetrievalError(f'Dimension <{dimension_name}>')
+                    return
+                self.score_repository.save_score(
+                    dimension=dimension,
+                    person=person,
+                    value=value,
+                    date=date )
+        self.listener.uploadSuccessful()
 
     class Parser():
 
