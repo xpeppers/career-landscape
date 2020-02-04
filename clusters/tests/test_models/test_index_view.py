@@ -8,14 +8,14 @@ from clusters.tests.factories.factory_methods import *
 
 from clusters.models import Circle, Topic, Dimension, Score
 from clusters.views import IndexView
-from  clusters.tests.factories.circle import CircleFactory
-from  clusters.tests.factories.topic import TopicFactory
-from  clusters.tests.factories.dimension import DimensionFactory
+from clusters.tests.factories.circle import CircleFactory
+from clusters.tests.factories.topic import TopicFactory
+from clusters.tests.factories.dimension import DimensionFactory
 
 
 class IndexViewTest(TestCase):
     def test_index_shows_cirle_and_topics_names(self):
-        client = Client()
+        client = get_logged_client()
         topic_name = "testTopic"
         circle_name = "testCircle"
         circle = CircleFactory.create(name=circle_name)
@@ -26,13 +26,13 @@ class IndexViewTest(TestCase):
         self.assertContains(response, topic_name)
 
     def test_index_with_no_circle_print_message(self):
-        client = Client()
+        client = get_logged_client()
 
         response = client.get("/")
         self.assertContains(response, "No Circle available.")
 
     def test_index_with_no_topic_in_circle_print_message(self):
-        client = Client()
+        client = get_logged_client()
         circle = CircleFactory.create()
         circle.save()
 
@@ -40,7 +40,7 @@ class IndexViewTest(TestCase):
         self.assertContains(response, "No Topics available.")
 
     def test_index_shows_topics_numbers(self):
-        client = Client()
+        client = get_logged_client()
         create_sample_with_score_values([1, 1, 0, 1])
 
         response = client.get("/")
@@ -50,7 +50,7 @@ class IndexViewTest(TestCase):
         self.assertContains(response, "topic3 : 1")
 
     def test_filtered_view_shows_only_selected_range_of_values(self):
-        client = Client()
+        client = get_logged_client()
         create_sample_with_score_values([1, 5, 4, 2])
         circle_id = Topic.objects.filter(name='topic0').first().circle.id
 
@@ -61,7 +61,7 @@ class IndexViewTest(TestCase):
         self.assertContains(response, "topic3 : 0")
 
     def test_filtered_view_shows_only_selected_dimensions_score(self):
-        client = Client()
+        client = get_logged_client()
         circle = CircleFactory.create()
         topic = TopicFactory.create(name="topic", circle=circle)
         dimension_one = DimensionFactory.create(name="dimension_one", topic=topic)
@@ -111,7 +111,7 @@ class IndexViewTest(TestCase):
         self.assertEqual(value, 1)
 
     def test_index_view_shows_all_circle_names(self):
-        client = Client()
+        client = get_logged_client()
         circles = [ CircleFactory.create() for _ in range(4) ]
         circles_names = [ circle.name for circle in circles ]
 
@@ -121,7 +121,7 @@ class IndexViewTest(TestCase):
             self.assertContains(response,name)
 
     def test_index_view_shows_all_topics_of_different_circles(self):
-        client = Client()
+        client = get_logged_client()
         first_circle = CircleFactory.create()
         second_circle = CircleFactory.create()
         first_circle_topics = [ TopicFactory.create(circle=first_circle) for _ in range(3)]
@@ -134,7 +134,7 @@ class IndexViewTest(TestCase):
             self.assertContains(response, topic_name)
 
     def test_alter_circle_value_filter_not_alter_others_circle_value_filter(self):
-        client = Client()
+        client = get_logged_client()
         person = create_users(1)[0]
         first_circle = CircleFactory.create()
         second_circle = CircleFactory.create()
@@ -151,7 +151,7 @@ class IndexViewTest(TestCase):
         self.assertContains(response, f'{second_circle_topic.name} : 1')
 
     def test_alter_circle_dimension_filter_not_alter_others_circle_dimension_filter(self):
-        client = Client()
+        client = get_logged_client()
         person = create_users(1)[0]
         first_circle = CircleFactory.create()
         second_circle = CircleFactory.create()
@@ -168,160 +168,9 @@ class IndexViewTest(TestCase):
         self.assertContains(response, f'{first_circle_topic.name} : 0')
         self.assertContains(response, f'{second_circle_topic.name} : 1')
 
-    def test_parse_xlsx_correct_import_datas_from_dataframe(self):
-        myfile = pandas.read_excel('clusters/tests/test_models/excel_test_file/cl_example.xlsx', header=None, index_col=False)
-        circle = CircleFactory.create()
-
-        result = IndexView().parse_xlsx(myfile)
-        expected_result = { 'user_name' : 'user_name', 'user_surname' : 'user_surname', 'circles' : [[
-            ('Circle','topic1','dimension1',2),
-            ('Circle','topic1','dimension2',1),
-            ('Circle','topic1','dimension3',2),
-            ('Circle','topic1','dimension4',1),
-            ('Circle','topic2','dimension1',4),
-            ('Circle','topic2','dimension2',4),
-            ('Circle','topic2','dimension3',4),
-            ('Circle','topic2','dimension4',4) ]] }
-
-        self.assertEqual(result['user_name'],expected_result['user_name'])
-        self.assertEqual(result['user_surname'],expected_result['user_surname'])
-        self.assertListEqual(result['circles'],expected_result['circles'])
-
-    def test_index_upload_xlsx_file_and_load_data(self):
-        client = Client()
-        create_example_excel_file_context()
-
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/',{ 'file' : xlsx_file })
-
-        scores = Score.objects.all()
-        self.assertEqual(len(scores),8)
-
-    def test_index_view_shows_correct_upload_file_message_if_success(self):
-        client = Client()
-        xlsx_file = create_example_excel_file_context()
-
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Upload Success!')
-
-    def test_index_view_shows_correct_upload_file_message_if_fail_with_wrong_file_post(self):
-        client = Client()
-        xlsx_file = 'false_file'
-        response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'File in Upload Form is not Valid')
-
-
-    def test_index_view_upload_file_with_not_registered_user_shows_error_message(self):
+    def test_if_not_logged_in_IndexView_redirect_to_login_page(self):
         client = Client()
 
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
+        response = client.get('/', follow=True)
 
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: User not registered! First add User user_name user_surname in database.')
-
-    def test_index_view_upload_file_with_no_circle_in_db_shows_error_message(self):
-        client = Client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
-        user.save()
-
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'No database Circle detected. Impossible to Proceed.')
-
-    def test_index_view_upload_file_with_not_registered_data_shows_error_message(self):
-        client = Client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
-        user.save()
-        circle = CircleFactory.create(name='Circle')
-
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Consistency Error: Topic <topic1> in xlsx file does not exists!')
-
-    def test_index_view_upload_bad_format_file_shows_correct_message(self):
-        client = Client()
-
-        with open('clusters/tests/test_models/excel_test_file/error_file.txt','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'File reading generate error: please check file format.')
-
-    def test_index_view_upload_bad_excel_file_shows_correct_message(self):
-        client = Client()
-
-        with open('clusters/tests/test_models/excel_test_file/wrong_excel.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Xlsx File has incorrect format! Impossible to Proceed.')
-
-    def test_index_view_upload_bad_date_file_shows_correct_message(self):
-        client = Client()
-
-        with open('clusters/tests/test_models/excel_test_file/excel_with_bad_date.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: Data not correct ( correct data format: dd-mm-yyyy ) ')
-
-    def test_index_view_upload_with_error_caused_by_homonymous_User(self):
-        client = Client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
-        user.save()
-        user_homonymous = UserFactory.build(username='username_homonymous', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
-        user_homonymous.save()
-
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Error in xlsx file datas: Multiple User with same First-Name and Last-Name (user_name user_surname): Consistency Error!')
-
-    def test_index_view_upload_with_bad_circle_in_excel(self):
-        client = Client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
-        user.save()
-        circle = CircleFactory.create(name='Circle_wrong')
-
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Consistency Error: Circle <Circle> in xlsx file does not exists!')
-
-    def test_index_view_upload_file_with_not_existing_dimension_shows_error_message(self):
-        client = Client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
-        user.save()
-        circle = CircleFactory.create(name='Circle')
-        topic_one = TopicFactory.create(name='topic1', circle=circle)
-        topic_two = TopicFactory.create(name='topic2', circle=circle)
-
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/', { 'file' : xlsx_file })
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Consistency Error: Dimension <dimension1> in xlsx file does not exists!')
-
+        self.assertContains(response,'Login')

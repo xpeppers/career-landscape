@@ -41,54 +41,23 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
+          <a class="nav-item nav-link active" href="{% url 'clusters:manage' %}">
+            Manage
+          </a>
           <a class="nav-item nav-link active" href="#">
             About <span class="sr-only">(current)</span>
           </a>
         </div>
       </div>
+      <span class="navbar-text mr-4">
+        Welcome, {{ request.user }}
+      </span>
+      <span class="navbar-text">
+        <a href="{% url 'logout' %}"> Logout </a>
+      </span>
     </nav>
 
     <div class='container-fluid clearfix'>
-
-      <div class="row">
-        <div class="col-md-12">
-          {% if messages %}
-            {% for message in messages%}
-            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-              <div class="alert alert-danger alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-            {% endif %}
-            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-              <div class="alert alert-success alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-            {% endif %}
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="row p-4">
-        <div class="col-md-4">
-          <div class="card p-3 upload" style="width: 18rem;">
-            <h4 class="card-title mb-2"> Upload .xlsx File Panel </h4>
-            <form action="{% url 'clusters:index' %}" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              {{ form }}
-              <br><br><input class="float-right" type="submit" value="Upload">
-            </form>
-          </div>
-        </div>
-        <div class="col-md-8"></div>
-      </div>
-
       <hr>
       {% if circles %}
         <form action="{% url 'clusters:index' %}" method="get">

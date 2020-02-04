@@ -1,4 +1,5 @@
 from clusters.models import Circle, Topic, Dimension, Score
+from django.test import Client
 from django.contrib.auth.models import User
 import pandas
 
@@ -33,3 +34,12 @@ def create_example_excel_file_context():
     topics = [ TopicFactory.create(name=f"topic{i}", circle=circle) for i in range(1,3) ]
     dimension_topic_1 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[0]) for i in range(1,5) ]
     dimension_topic_2 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[1]) for i in range(1,5) ]
+
+def get_logged_client():
+    username='myuser'
+    password='myusmypass'
+    user = UserFactory.build( username=username, password=password )
+    user.save()
+    client = Client()
+    client.login( username=username, password=password )
+    return client
