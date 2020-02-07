@@ -53,7 +53,6 @@ def create_example_excel_file_context():
     ]
 
 
-<<<<<<< HEAD
 def create_example_excel_file_topics_numbers():
     user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
     user.save()
@@ -71,12 +70,6 @@ def get_logged_staff_client():
     username='myuser'
     password='myusmypass'
     user = UserFactory.build( username=username, password=password, is_staff=True )
-=======
-def get_logged_client():
-    username = "myuser"
-    password = "myusmypass"
-    user = UserFactory.build(username=username, password=password)
->>>>>>> 7ac65ab34141a564ce09a0b8f5e5fbf22032a214
     user.save()
     client = Client()
     client.login(username=username, password=password)

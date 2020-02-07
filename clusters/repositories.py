@@ -23,8 +23,7 @@ class CircleRepository:
         except Circle.DoesNotExist as _:
             return None
 
-
-<<<<<<< HEAD
+class ScoreRepository:
     def save_score(self, dimension, person, value, date, kind):
         already_exists = Score.objects.filter(dimension=dimension, person=person, value=value, date=date, kind=kind).first()
         if already_exists is None:
@@ -35,11 +34,6 @@ class CircleRepository:
                 date=date,
                 kind=kind).save()
 
-=======
-class ScoreRepository:
-    def save_score(self, dimension, person, value, date):
-        Score(dimension=dimension, person=person, value=value, date=date).save()
->>>>>>> 7ac65ab34141a564ce09a0b8f5e5fbf22032a214
 
 
 class TopicRepository:
