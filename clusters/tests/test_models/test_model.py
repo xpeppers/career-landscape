@@ -4,8 +4,8 @@ from django.db.utils import IntegrityError
 from clusters.tests.factories.factory_methods import *
 
 from clusters.models import Circle, Topic, Dimension, Score
-from  clusters.tests.factories.circle import CircleFactory
-from  clusters.tests.factories.topic import TopicFactory
+from clusters.tests.factories.circle import CircleFactory
+from clusters.tests.factories.topic import TopicFactory
 
 
 class TopicModelTest(TestCase):
@@ -61,9 +61,8 @@ class DimensionModelTest(TestCase):
 
 
 class ScoreModelTest(TestCase):
-
     def test_different_score_have_different_date_field(self):
-        create_sample_with_score_values([1,2])
+        create_sample_with_score_values([1, 2])
 
         scores = Score.objects.all()
         first_score = scores.first()

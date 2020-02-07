@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('clusters', '0002_dimension_score'),
+        ("clusters", "0002_dimension_score"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='score',
-            name='date',
+            model_name="score",
+            name="date",
             field=models.DateTimeField(blank=True, default=datetime.datetime.now),
         ),
     ]

@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 
-class ExcelUploadUseCase():
+class ExcelUploadUseCase:
     user_repository = None
     circle_repository = None
     score_repository = None
@@ -11,7 +11,15 @@ class ExcelUploadUseCase():
     dimension_repository = None
     listener = None
 
-    def __init__(self, user_repository, circle_repository, score_repository, topic_repository, dimension_repository, listener):
+    def __init__(
+        self,
+        user_repository,
+        circle_repository,
+        score_repository,
+        topic_repository,
+        dimension_repository,
+        listener,
+    ):
         self.user_repository = user_repository
         self.circle_repository = circle_repository
         self.score_repository = score_repository
@@ -34,10 +42,9 @@ class ExcelUploadUseCase():
                 return
         self.listener.uploadSuccessful()
 
-
     def save_new_scores(self, parsed_data):
         try:
-            date = datetime.strptime(parsed_data['compilation_date'], "%d-%m-%Y")
+            date = datetime.strptime(parsed_data["compilation_date"], "%d-%m-%Y")
         except ValueError as _:
             self.listener.dataError()
             return False
@@ -101,7 +108,7 @@ class ExcelUploadUseCase():
 
         def parse_circle(self, dataframe):
             lines = []
-            circle_name = dataframe.iat[0,0]
+            circle_name = dataframe.iat[0, 0]
             for topic_index in dataframe.columns[1:]:
                 topic = dataframe.iat[1, topic_index]
                 if pd.isnull(topic):
@@ -111,6 +118,3 @@ class ExcelUploadUseCase():
                     value = dataframe.iat[dimension_index, topic_index]
                     lines.append((circle_name, topic, dimension, value))
             return lines
-
-
-

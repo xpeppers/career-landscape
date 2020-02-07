@@ -7,13 +7,13 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('clusters', '0004_auto_20200129_1059'),
+        ("clusters", "0004_auto_20200129_1059"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='score',
-            name='date',
+            model_name="score",
+            name="date",
             field=models.DateTimeField(blank=True, default=django.utils.timezone.now),
         ),
     ]

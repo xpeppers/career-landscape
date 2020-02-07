@@ -2,8 +2,8 @@ from .models import Circle, Score, Topic, Dimension
 from django.contrib.auth.models import User
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
-class UserRepository():
 
+class UserRepository:
     def get_user_by_first_name_and_last_name(self, first_name, last_name):
         try:
             return User.objects.get(first_name=first_name, last_name=last_name)
@@ -12,19 +12,19 @@ class UserRepository():
         except MultipleObjectsReturned as _:
             return None
 
-class CircleRepository():
 
+class CircleRepository:
     def get_all_circles(self):
         return Circle.objects.all()
 
     def get_circle_by_name(self, name):
         try:
             return Circle.objects.get(name=name)
-        except Circle.DoesNotExist as _ :
+        except Circle.DoesNotExist as _:
             return None
 
-class ScoreRepository():
 
+<<<<<<< HEAD
     def save_score(self, dimension, person, value, date, kind):
         already_exists = Score.objects.filter(dimension=dimension, person=person, value=value, date=date, kind=kind).first()
         if already_exists is None:
@@ -35,19 +35,24 @@ class ScoreRepository():
                 date=date,
                 kind=kind).save()
 
+=======
+class ScoreRepository:
+    def save_score(self, dimension, person, value, date):
+        Score(dimension=dimension, person=person, value=value, date=date).save()
+>>>>>>> 7ac65ab34141a564ce09a0b8f5e5fbf22032a214
 
-class TopicRepository():
 
+class TopicRepository:
     def get_topic_by_name_and_circle(self, name, circle):
         try:
             return Topic.objects.get(circle=circle, name=name)
-        except Topic.DoesNotExist as _ :
+        except Topic.DoesNotExist as _:
             return None
 
-class DimensionRepository():
 
+class DimensionRepository:
     def get_dimension_by_name_and_topic(self, name, topic):
         try:
             return Dimension.objects.get(topic=topic, name=name)
-        except Dimension.DoesNotExist as _ :
+        except Dimension.DoesNotExist as _:
             return None
