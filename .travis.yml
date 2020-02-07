@@ -34,5 +34,5 @@ install:
 
 script:
   - pipenv run python manage.py migrate
-  - pipenv run black ./
+  - pipenv run black --check ./
   - pipenv run python manage.py test

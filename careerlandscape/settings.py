@@ -98,8 +98,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
-FILE_UPLOAD_HANDLERS = ("django_excel.ExcelMemoryFileUploadHandler",
-                        "django_excel.TemporaryExcelFileUploadHandler")
+FILE_UPLOAD_HANDLERS = (
+    "django_excel.ExcelMemoryFileUploadHandler",
+    "django_excel.TemporaryExcelFileUploadHandler",
+)
 
 
 # Internationalization
@@ -121,4 +123,4 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/"

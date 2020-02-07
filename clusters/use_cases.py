@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 
-class ExcelUploadUseCase():
+class ExcelUploadUseCase:
     user_repository = None
     circle_repository = None
     score_repository = None
@@ -11,7 +11,15 @@ class ExcelUploadUseCase():
     dimension_repository = None
     listener = None
 
-    def __init__(self, user_repository, circle_repository, score_repository, topic_repository, dimension_repository, listener):
+    def __init__(
+        self,
+        user_repository,
+        circle_repository,
+        score_repository,
+        topic_repository,
+        dimension_repository,
+        listener,
+    ):
         self.user_repository = user_repository
         self.circle_repository = circle_repository
         self.score_repository = score_repository
@@ -21,7 +29,9 @@ class ExcelUploadUseCase():
 
     def uploadFile(self, form, file):
         try:
-            parsed_data = self.Parser().parse_xlsx(file, self.circle_repository.get_all_circles())
+            parsed_data = self.Parser().parse_xlsx(
+                file, self.circle_repository.get_all_circles()
+            )
         except Exception as _:
             self.listener.badFileFormat()
             return
@@ -30,18 +40,19 @@ class ExcelUploadUseCase():
             return
         self.save_new_scores(parsed_data)
 
-
     def save_new_scores(self, parsed_data):
         try:
-            date = datetime.strptime(parsed_data['compilation_date'], "%d-%m-%Y")
+            date = datetime.strptime(parsed_data["compilation_date"], "%d-%m-%Y")
         except ValueError as _:
             self.listener.dataError()
             return
-        person = self.user_repository.get_user_by_first_name_and_last_name(parsed_data['user_name'], parsed_data['user_surname'])
+        person = self.user_repository.get_user_by_first_name_and_last_name(
+            parsed_data["user_name"], parsed_data["user_surname"]
+        )
         if person is None:
             self.listener.userError()
             return
-        circles = parsed_data['circles']
+        circles = parsed_data["circles"]
         if not circles:
             self.listener.noCircleInDatabase()
             return
@@ -49,25 +60,28 @@ class ExcelUploadUseCase():
             for circle_name, topic_name, dimension_name, value in circle:
                 circle = self.circle_repository.get_circle_by_name(circle_name)
                 if circle is None:
-                    self.listener.onDimensionRetrievalError(f'Circle <{circle_name}>')
+                    self.listener.onDimensionRetrievalError(f"Circle <{circle_name}>")
                     return
-                topic = self.topic_repository.get_topic_by_name_and_circle(topic_name, circle)
+                topic = self.topic_repository.get_topic_by_name_and_circle(
+                    topic_name, circle
+                )
                 if topic is None:
-                    self.listener.onDimensionRetrievalError(f'Topic <{topic_name}>')
+                    self.listener.onDimensionRetrievalError(f"Topic <{topic_name}>")
                     return
-                dimension = self.dimension_repository.get_dimension_by_name_and_topic(dimension_name, topic)
+                dimension = self.dimension_repository.get_dimension_by_name_and_topic(
+                    dimension_name, topic
+                )
                 if dimension is None:
-                    self.listener.onDimensionRetrievalError(f'Dimension <{dimension_name}>')
+                    self.listener.onDimensionRetrievalError(
+                        f"Dimension <{dimension_name}>"
+                    )
                     return
                 self.score_repository.save_score(
-                    dimension=dimension,
-                    person=person,
-                    value=value,
-                    date=date )
+                    dimension=dimension, person=person, value=value, date=date
+                )
         self.listener.uploadSuccessful()
 
-    class Parser():
-
+    class Parser:
         def parse_xlsx(self, file, circles):
             dataframe = pd.read_excel(file, header=None, index_col=False)
             try:
@@ -77,20 +91,23 @@ class ExcelUploadUseCase():
                 lines_of_table = 7
                 table_index = 0
                 for _ in range(n_tables):
-                    sub_dataframe = tables_dataframe[table_index:table_index + lines_of_table]
-                    circles.append( self.parse_circle(sub_dataframe) )
+                    sub_dataframe = tables_dataframe[
+                        table_index : table_index + lines_of_table
+                    ]
+                    circles.append(self.parse_circle(sub_dataframe))
                     table_index = table_index + lines_of_table
                 return {
-                    'user_name': dataframe.iloc[1,1],
-                    'user_surname': dataframe.iloc[1,2],
-                    'compilation_date' : dataframe.iloc[1,3],
-                    'circles': circles }
+                    "user_name": dataframe.iloc[1, 1],
+                    "user_surname": dataframe.iloc[1, 2],
+                    "compilation_date": dataframe.iloc[1, 3],
+                    "circles": circles,
+                }
             except IndexError as ie:
                 return {}
 
         def parse_circle(self, dataframe):
             lines = []
-            circle_name = dataframe.iat[0,0]
+            circle_name = dataframe.iat[0, 0]
             for topic_index in dataframe.columns[1:]:
                 topic = dataframe.iat[1, topic_index]
                 if pd.isnull(topic):
@@ -100,6 +117,3 @@ class ExcelUploadUseCase():
                     value = dataframe.iat[dimension_index, topic_index]
                     lines.append((circle_name, topic, dimension, value))
             return lines
-
-
-
