@@ -41,18 +41,12 @@ class ManageView(generic.TemplateView):
         return render(request, 'clusters/manage.html', self.get_context_data())
 
     def post(self, request):
-        if request.method == 'POST':
-            upload_form = UploadFileForm(request.POST, request.FILES)
-            if upload_form.is_valid():
-                self.upload_form_valid(upload_form)
-            else:
-                self.upload_form_invalid(upload_form)
-            return HttpResponseRedirect('/manage')
+        upload_form = UploadFileForm(request.POST, request.FILES)
+        if upload_form.is_valid():
+            self.upload_form_valid(upload_form)
         else:
-            upload_form = UploadFileForm
-            return render(request, 'clusters/manage.html', {
-                'upload': upload_form,
-            })
+            self.upload_form_invalid(upload_form)
+        return HttpResponseRedirect('/manage')
 
     def append_user_form_context(self, context):
         users = { user.id : ( user.first_name , user.last_name ) for user in User.objects.all() }
@@ -90,7 +84,6 @@ class ManageView(generic.TemplateView):
 
     def onDimensionRetrievalError(self, message):
         messages.error(self.request, f'Consistency Error: {message} in xlsx file does not exists!')
-
 
 @staff_member_required
 def userView(request, user_id):

@@ -45,10 +45,10 @@ class IndexViewTest(TestCase):
 
         response = client.get("/")
 
-        self.assertContains(response, 'topic0 : <span class="badge badge-secondary badge-pill">1</span>')
-        self.assertContains(response, 'topic1 : <span class="badge badge-secondary badge-pill">1</span>')
-        self.assertContains(response, 'topic2 : <span class="badge badge-secondary badge-pill">0</span>')
-        self.assertContains(response, 'topic3 : <span class="badge badge-secondary badge-pill">1</span>')
+        self.assertContains(response, 'topic0 : <span class="badge dark-grey-bg text-white">1</span>')
+        self.assertContains(response, 'topic1 : <span class="badge dark-grey-bg text-white">1</span>')
+        self.assertContains(response, 'topic2 : <span class="badge dark-grey-bg text-white">0</span>')
+        self.assertContains(response, 'topic3 : <span class="badge dark-grey-bg text-white">1</span>')
 
     def test_filtered_view_shows_only_selected_range_of_values(self):
         client = get_logged_staff_client()
@@ -56,10 +56,10 @@ class IndexViewTest(TestCase):
         circle_id = Topic.objects.filter(name='topic0').first().circle.id
 
         response = client.get("/", {f'topic_value_gt_{circle_id}' : 3})
-        self.assertContains(response, 'topic0 : <span class="badge badge-secondary badge-pill">0</span>')
-        self.assertContains(response, 'topic1 : <span class="badge badge-secondary badge-pill">1</span>')
-        self.assertContains(response, 'topic2 : <span class="badge badge-secondary badge-pill">1</span>')
-        self.assertContains(response, 'topic3 : <span class="badge badge-secondary badge-pill">0</span>')
+        self.assertContains(response, 'topic0 : <span class="badge dark-grey-bg text-white">0</span>')
+        self.assertContains(response, 'topic1 : <span class="badge dark-grey-bg text-white">1</span>')
+        self.assertContains(response, 'topic2 : <span class="badge dark-grey-bg text-white">1</span>')
+        self.assertContains(response, 'topic3 : <span class="badge dark-grey-bg text-white">0</span>')
 
     def test_filtered_view_shows_only_selected_dimensions_score(self):
         client = get_logged_staff_client()
@@ -75,7 +75,7 @@ class IndexViewTest(TestCase):
         score_second.save()
 
         response = client.get("/", {f'topic_dimension_eq_{circle.id}' : dimension_one.id})
-        self.assertContains(response, 'topic : <span class="badge badge-secondary badge-pill">1</span>')
+        self.assertContains(response, 'topic : <span class="badge dark-grey-bg text-white">1</span>')
 
     def test_index_add_expected_context(self):
         create_sample_with_score_values([1, 1, 0, 1])
@@ -148,8 +148,8 @@ class IndexViewTest(TestCase):
 
         response = client.get("/", {f'topic_value_gt_{first_circle.id}' : 4})
 
-        self.assertContains(response, f'{first_circle_topic.name} : <span class="badge badge-secondary badge-pill">0</span>')
-        self.assertContains(response, f'{second_circle_topic.name} : <span class="badge badge-secondary badge-pill">1</span>')
+        self.assertContains(response, f'{first_circle_topic.name} : <span class="badge dark-grey-bg text-white">0</span>')
+        self.assertContains(response, f'{second_circle_topic.name} : <span class="badge dark-grey-bg text-white">1</span>')
 
     def test_alter_circle_dimension_filter_not_alter_others_circle_dimension_filter(self):
         client = get_logged_staff_client()
@@ -166,8 +166,8 @@ class IndexViewTest(TestCase):
 
         response = client.get("/", {f'topic_dimension_eq_{first_circle.id}' : f'{first_circle_dimension_empty.id}' })
 
-        self.assertContains(response, f'{first_circle_topic.name} : <span class="badge badge-secondary badge-pill">0</span>')
-        self.assertContains(response, f'{second_circle_topic.name} : <span class="badge badge-secondary badge-pill">1</span>')
+        self.assertContains(response, f'{first_circle_topic.name} : <span class="badge dark-grey-bg text-white">0</span>')
+        self.assertContains(response, f'{second_circle_topic.name} : <span class="badge dark-grey-bg text-white">1</span>')
 
     def test_if_not_logged_in_IndexView_redirect_to_login_page(self):
         client = Client()

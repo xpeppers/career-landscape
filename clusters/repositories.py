@@ -26,12 +26,14 @@ class CircleRepository():
 class ScoreRepository():
 
     def save_score(self, dimension, person, value, date, kind):
-        Score(
-            dimension=dimension,
-            person=person,
-            value=value,
-            date=date,
-            kind=kind).save()
+        already_exists = Score.objects.filter(dimension=dimension, person=person, value=value, date=date, kind=kind).first()
+        if already_exists is None:
+            Score(
+                dimension=dimension,
+                person=person,
+                value=value,
+                date=date,
+                kind=kind).save()
 
 
 class TopicRepository():

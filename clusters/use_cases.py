@@ -49,7 +49,6 @@ class ExcelUploadUseCase():
         if not circles:
             self.listener.noCircleInDatabase()
             return False
-        kind = parsed_data['kind']
         for circle in circles:
             for circle_name, topic_name, dimension_name, value in circle:
                 circle = self.circle_repository.get_circle_by_name(circle_name)
@@ -69,7 +68,7 @@ class ExcelUploadUseCase():
                     person=person,
                     value=value,
                     date=date,
-                    kind=kind )
+                    kind=parsed_data['kind'] )
         return True
 
 
@@ -81,22 +80,21 @@ class ExcelUploadUseCase():
             for i in range(0,len(sheets_numbers)):
                 dataframe = xlsx_dataframe[sheets_numbers[i]]
                 try:
-                    n_tables = len(circles)
                     tables_dataframe = dataframe[3:]
-                    circles = []
+                    parsed_circles = []
                     lines_of_table = 7
                     table_index = 0
-                    for _ in range(n_tables):
+                    for _ in range(len(circles)):
                         sub_dataframe = tables_dataframe[table_index:table_index + lines_of_table]
-                        circles.append( self.parse_circle(sub_dataframe) )
+                        parsed_circles.append( self.parse_circle(sub_dataframe) )
                         table_index = table_index + lines_of_table
                     parsed_sheets.append( {
                         'user_name': dataframe.iloc[1,1],
                         'user_surname': dataframe.iloc[1,2],
                         'compilation_date' : dataframe.iloc[1,3],
                         'kind' : i,
-                        'circles': circles, } )
-                except IndexError as ie:
+                        'circles': parsed_circles, } )
+                except IndexError as _:
                     return []
             return parsed_sheets
 

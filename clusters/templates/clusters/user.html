@@ -101,8 +101,8 @@
             </h3>
             {% for topic, topic_context in user_topics_values.items %}
                 <div class="row p-2">
-                    <div class="col-md-6">
-                        <div class="card m-5 p-2" style="width: 27rem;">
+                    <div class="col-md-5">
+                        <div class="shadow card m-5 p-2" style="width: 27rem;">
                             <div class="card-body">
                                 <h3 class="card-title title">
                                     <img src="{% static "clusters/images/diamond-half.svg" %}" alt="" width="30" height="30" title="Documents">
@@ -158,7 +158,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 pr-5">
+                    <div class="col-md-7 pl-5">
                         <div
                         class='media'
                         id="{{ topic }}"

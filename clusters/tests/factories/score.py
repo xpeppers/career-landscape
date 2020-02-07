@@ -8,8 +8,9 @@ class ScoreFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = 'clusters.Score'
-        django_get_or_create = ('dimension','person','value')
+        django_get_or_create = ('dimension','person','value','kind')
 
     dimension = factory.SubFactory(DimensionFactory)
     person = factory.SubFactory(UserFactory)
     value = 1
+    kind = 0

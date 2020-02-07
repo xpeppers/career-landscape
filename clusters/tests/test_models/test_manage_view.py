@@ -163,6 +163,17 @@ class ManageViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Consistency Error: Dimension <dimension1> in xlsx file does not exists!')
 
+    def test_manage_view_upload_file_with_circles_with_different_topics_numbers(self):
+        client = get_logged_staff_client()
+        xlsx_file = create_example_excel_file_topics_numbers()
+
+        with open('clusters/tests/test_models/excel_test_file/cl_example_topics_disparity.xlsx','rb') as xlsx_file:
+            response = client.post('/manage/', { 'file' : xlsx_file }, follow=True)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Upload Success!')
+
     def test_manage_view_shows_users_form(self):
         client = get_logged_staff_client()
         users = [ UserFactory.build(username= f'username{i}', password = f'blabla{i}', first_name=f'username{i}' ) for i in range(3)]
@@ -173,3 +184,14 @@ class ManageViewTest(TestCase):
 
         for i in range(3):
             self.assertContains(response, f'username{i}')
+
+    def test_manage_view_redirect_to_userview_after_selecting_a_user(self):
+        client = get_logged_staff_client()
+        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user.save()
+
+        response = client.get('/manage/', { 'selected_user' : user.id }, follow=True )
+
+        self.assertContains(response,user.first_name)
+        self.assertContains(response,user.last_name)
+        self.assertRedirects(response, f'/users/{user.id}', status_code=302 )
