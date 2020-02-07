@@ -21,14 +21,18 @@ class ExcelUploadUseCase():
 
     def uploadFile(self, form, file):
         try:
-            parsed_data = self.Parser().parse_xlsx(file, self.circle_repository.get_all_circles())
-        except Exception as _:
+            parsed_sheets = self.Parser().parse_xlsx(file, self.circle_repository.get_all_circles())
+        except Exception as e:
             self.listener.badFileFormat()
             return
-        if not parsed_data:
+        if not parsed_sheets:
             self.listener.dataNotParsed()
             return
-        self.save_new_scores(parsed_data)
+        for sheet in parsed_sheets:
+            correct_save = self.save_new_scores(sheet)
+            if not correct_save:
+                return
+        self.listener.uploadSuccessful()
 
 
     def save_new_scores(self, parsed_data):
@@ -36,57 +40,66 @@ class ExcelUploadUseCase():
             date = datetime.strptime(parsed_data['compilation_date'], "%d-%m-%Y")
         except ValueError as _:
             self.listener.dataError()
-            return
+            return False
         person = self.user_repository.get_user_by_first_name_and_last_name(parsed_data['user_name'], parsed_data['user_surname'])
         if person is None:
             self.listener.userError()
-            return
+            return False
         circles = parsed_data['circles']
         if not circles:
             self.listener.noCircleInDatabase()
-            return
+            return False
+        kind = parsed_data['kind']
         for circle in circles:
             for circle_name, topic_name, dimension_name, value in circle:
                 circle = self.circle_repository.get_circle_by_name(circle_name)
                 if circle is None:
                     self.listener.onDimensionRetrievalError(f'Circle <{circle_name}>')
-                    return
+                    return False
                 topic = self.topic_repository.get_topic_by_name_and_circle(topic_name, circle)
                 if topic is None:
                     self.listener.onDimensionRetrievalError(f'Topic <{topic_name}>')
-                    return
+                    return False
                 dimension = self.dimension_repository.get_dimension_by_name_and_topic(dimension_name, topic)
                 if dimension is None:
                     self.listener.onDimensionRetrievalError(f'Dimension <{dimension_name}>')
-                    return
+                    return False
                 self.score_repository.save_score(
                     dimension=dimension,
                     person=person,
                     value=value,
-                    date=date )
-        self.listener.uploadSuccessful()
+                    date=date,
+                    kind=kind )
+        return True
+
 
     class Parser():
 
-        def parse_xlsx(self, file, circles):
-            dataframe = pd.read_excel(file, header=None, index_col=False)
-            try:
-                n_tables = len(circles)
-                tables_dataframe = dataframe[3:]
-                circles = []
-                lines_of_table = 7
-                table_index = 0
-                for _ in range(n_tables):
-                    sub_dataframe = tables_dataframe[table_index:table_index + lines_of_table]
-                    circles.append( self.parse_circle(sub_dataframe) )
-                    table_index = table_index + lines_of_table
-                return {
-                    'user_name': dataframe.iloc[1,1],
-                    'user_surname': dataframe.iloc[1,2],
-                    'compilation_date' : dataframe.iloc[1,3],
-                    'circles': circles }
-            except IndexError as ie:
-                return {}
+        def parse_xlsx(self, file, circles, sheets_numbers=[0, 2, 3]):
+            parsed_sheets = []
+            xlsx_dataframe = pd.read_excel(file, header=None, index_col=False, sheet_name=sheets_numbers)
+            for i in range(0,len(sheets_numbers)):
+                dataframe = xlsx_dataframe[sheets_numbers[i]]
+                try:
+                    n_tables = len(circles)
+                    tables_dataframe = dataframe[3:]
+                    circles = []
+                    lines_of_table = 7
+                    table_index = 0
+                    for _ in range(n_tables):
+                        sub_dataframe = tables_dataframe[table_index:table_index + lines_of_table]
+                        circles.append( self.parse_circle(sub_dataframe) )
+                        table_index = table_index + lines_of_table
+                    parsed_sheets.append( {
+                        'user_name': dataframe.iloc[1,1],
+                        'user_surname': dataframe.iloc[1,2],
+                        'compilation_date' : dataframe.iloc[1,3],
+                        'kind' : i,
+                        'circles': circles, } )
+                except IndexError as ie:
+                    return []
+            return parsed_sheets
+
 
         def parse_circle(self, dataframe):
             lines = []

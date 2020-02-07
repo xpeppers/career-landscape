@@ -20,6 +20,6 @@ class UploadExcelUseCase(TestCase):
             ('Circle','topic2','dimension3',4),
             ('Circle','topic2','dimension4',4) ]] }
 
-        self.assertEqual(result['user_name'],expected_result['user_name'])
-        self.assertEqual(result['user_surname'],expected_result['user_surname'])
-        self.assertListEqual(result['circles'],expected_result['circles'])
+        self.assertEqual(result[0]['user_name'],expected_result['user_name'])
+        self.assertEqual(result[0]['user_surname'],expected_result['user_surname'])
+        self.assertListEqual(result[0]['circles'],expected_result['circles'])

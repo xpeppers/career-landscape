@@ -35,10 +35,10 @@ def create_example_excel_file_context():
     dimension_topic_1 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[0]) for i in range(1,5) ]
     dimension_topic_2 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics[1]) for i in range(1,5) ]
 
-def get_logged_client():
+def get_logged_staff_client():
     username='myuser'
     password='myusmypass'
-    user = UserFactory.build( username=username, password=password )
+    user = UserFactory.build( username=username, password=password, is_staff=True )
     user.save()
     client = Client()
     client.login( username=username, password=password )

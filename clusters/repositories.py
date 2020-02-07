@@ -25,12 +25,14 @@ class CircleRepository():
 
 class ScoreRepository():
 
-    def save_score(self, dimension, person, value, date):
+    def save_score(self, dimension, person, value, date, kind):
         Score(
             dimension=dimension,
             person=person,
             value=value,
-            date=date).save()
+            date=date,
+            kind=kind).save()
+
 
 class TopicRepository():
 

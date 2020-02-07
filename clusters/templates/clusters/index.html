@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <meta name="description" content="clusters">
 
+    <link rel="icon" href="{% static "clusters/images/favicon.ico" %}" />
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -28,8 +29,8 @@
   </head>
 
   <body>
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand title" href="{% url 'clusters:index' %}">
+    <nav class="navbar sticky-top navbar-expand-lg dark-grey-bg text-white">
+      <a class="navbar-brand text-white title" href="{% url 'clusters:index' %}">
         Career Landscape
       </a>
       <button class="navbar-toggler" type="button"
@@ -41,19 +42,20 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link active" href="{% url 'clusters:manage' %}">
-            Manage
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
+                Manage
           </a>
-          <a class="nav-item nav-link active" href="#">
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
             About <span class="sr-only">(current)</span>
           </a>
         </div>
       </div>
       <span class="navbar-text mr-4">
+        <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
         Welcome, {{ request.user }}
       </span>
       <span class="navbar-text">
-        <a href="{% url 'logout' %}"> Logout </a>
+        <a class="text-light" href="{% url 'logout' %}"> Logout </a>
       </span>
     </nav>
 
@@ -67,20 +69,22 @@
                 <div class="card" style="width: 18rem;">
                   <div class="card-body">
                     <h3 class="card-title title">
+                      <img src="{% static "clusters/images/circle-half.svg" %}" alt="" width="32" height="32" title="Documents">
                       {{ circle_name }} Circle
                     </h3>
-                    <h4 class="card-subtitle mb-2 text-muted">
-                      Topics:
-                    </h4>
                     <p class="card-text">
-                      Here the {{ circle_name }} Circle description.
+                      Here the {{ circle_name }} Circle description ..
                     </p>
+                    <hr>
+                    <h5 class="card-subtitle mb-2 text-muted">
+                      Topics:
+                    </h5>
                     {% if context.topics_details %}
-                      <ul>
+                      <ul  class="list-group">
                         {% for name, number in context.topics_details.items %}
-                          <h6>
-                            <li>{{ name }} : {{ number }}</li>
-                          </h6>
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ name }} : <span class="badge dark-grey-bg text-white">{{ number }}</span>
+                          </li>
                         {% endfor %}
                       </ul>
                       <hr>
@@ -163,7 +167,7 @@
 
     <footer
       id="sticky-footer"
-      class="py-4 bg-dark text-white-50"
+      class="footer fixed-bottom py-2 dark-grey-bg text-white-50"
       style="margin-top:40px"
     >
       <div class="container text-center">
@@ -192,6 +196,10 @@
           r: Object.values(topics_details),
           theta: topics_names,
           fill: 'toself',
+          fillcolor: 'rgba(224,0,0,0.5)',
+          line : {
+                color : 'rgba(224,0,0,1)',
+                },
           hovertext: tooltip,
           hoverinfo: "text",
         }];

@@ -1,0 +1,289 @@
+<!doctype html>
+
+{% load static %}
+
+<html lang="en">
+  <head>
+    <title>Clusters</title>
+
+    <meta charset="utf-8">
+    <meta name="description" content="clusters">
+
+    <link rel="icon" href="{% static "clusters/images/favicon.ico" %}" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    >
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Dosis|Kaushan+Script&display=swap"
+    >
+    <link
+      rel="stylesheet"
+      href="{% static "clusters/css/style.css" %}"
+    >
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar sticky-top navbar-expand-lg dark-grey-bg text-white">
+      <a class="navbar-brand text-white title" href="{% url 'clusters:index' %}">
+        Career Landscape
+      </a>
+      <button class="navbar-toggler" type="button"
+        data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
+                Manage
+          </a>
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
+            About <span class="sr-only">(current)</span>
+          </a>
+        </div>
+      </div>
+      <span class="navbar-text mr-4">
+        <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
+        Welcome, {{ request.user }}
+      </span>
+      <span class="navbar-text">
+        <a class="text-light" href="{% url 'logout' %}"> Logout </a>
+      </span>
+    </nav>
+
+
+    <div class='container-fluid clearfix'>
+
+        <div class="row">
+            <div class=" shadow card p-3 col-md-12">
+                <h3 class="text-justify title text-center">
+                    <img src="{% static "clusters/images/chevron-compact-left.svg" %}" alt="" width="38" height="38" title="Documents">
+                   {{ first_name }} {{ last_name }}
+                   <img src="{% static "clusters/images/chevron-compact-right.svg" %}" alt="" width="38" height="38" title="Documents">
+                </h3>
+                <hr>
+                <form action="{% url 'clusters:users' user_id %}" method="get">
+                    <div class="form-group">
+                        <label for="selected_user_circle">
+                            <h5>
+                                <img src="{% static "clusters/images/circle-half.svg" %}" alt="" width="30" height="30" title="Documents">
+                                User Circles
+                            </h5>
+                          </label>
+                          <select
+                          class="form-control"
+                          name="selected_user_circle"
+                          id="selected_user_circle"
+                          >
+                            {% for circle_id, circle_name in circles %}
+                                <option value={{ circle_id }}>
+                                  {{ circle_name }} Circle
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="submit" value="See Circle">
+                </form>
+            </div>
+        </div>
+        <hr>
+        {% if user_topics_values %}
+            <h3 class="p-3 card title light-grey-bg text-dark text-center">
+                {{circle_name}} Circle
+            </h3>
+            {% for topic, topic_context in user_topics_values.items %}
+                <div class="row p-2">
+                    <div class="col-md-6">
+                        <div class="card m-5 p-2" style="width: 27rem;">
+                            <div class="card-body">
+                                <h3 class="card-title title">
+                                    <img src="{% static "clusters/images/diamond-half.svg" %}" alt="" width="30" height="30" title="Documents">
+                                    {{ topic }} Topic
+                                </h3>
+                                <p> Here the description of {{topic}} .. </p>
+                                <br>
+                                <h5 class="card-subtitle mb-2 text-muted">
+                                    Dimension of Knowldge:
+                                </h5>
+                                <table class="table table-hover p-4 " style="border-radius: 50%;">
+                                    <thead class="dark-grey-bg text-white bordered">
+                                        <tr>
+                                            <th scope="col"><i>Name</i></th>
+                                            <th scope="col"><i>Actual</i></th>
+                                            <th scope="col"><i>Momentum</i></th>
+                                            <th scope="col"><i>NextStep</i></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for dimension, value in topic_context.items %}
+                                            <tr>
+                                                <th scope="col">{{dimension}}</th>
+                                                <td class="text-center bordered"><span class="badge badge-secondary red-bg">{{value.0}}</span></td>
+                                                <td class="text-center bordered"><span class="badge badge-secondary yellow-bg">{{value.1}}</span></td>
+                                                <td class="text-center bordered"><span class="badge badge-secondary green-bg">{{value.2}}</span></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <br>
+                                <form action="{% url 'clusters:users' user_id %}" method="get">
+                                    <div class="form-check form-check-inline">
+                                        {% if apply_momentum_to_radar and selected_topic == topic %}
+                                        <input class="form-check-input" type="checkbox" name='momentum' checked>
+                                        {% else %}
+                                        <input class="form-check-input" type="checkbox" name='momentum'>
+                                        {% endif %}
+                                        <label class="form-check-label" for="momentum">Show Momentum Values</label>
+                                    </div><br>
+                                    <div class="form-check form-check-inline">
+                                        {% if apply_next_step_to_radar and selected_topic == topic %}
+                                            <input class="form-check-input" type="checkbox" name='next-step' checked>
+                                        {% else %}
+                                            <input class="form-check-input" type="checkbox" name='next-step'>
+                                        {% endif %}
+                                        <label class="form-check-label" for="next-step">Show Next Step Values</label>
+                                    </div>
+                                    <input type="hidden" name="selected_user_circle" value="{{selected_circle_id}}">
+                                    <input type="hidden" name="selected_topic" value="{{topic}}">
+                                    <button type="submit" class="btn dark-grey-bg text-white btn-sm float-right">Show me</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 pr-5">
+                        <div
+                        class='media'
+                        id="{{ topic }}"
+                        style="width:500px;height:500px;padding: 40px;"
+                        ></div>
+                    </div>
+                </div>
+                <hr style="border-width: 1px;">
+            {% endfor %}
+        {% elif circle_name %}
+            <h3 class="p-3 card title bg-secondary text-white text-center">{{circle_name}}</h3>
+            <p class="p-3 card bg-danger text-white text-center">
+                <b> - information not available - </b><br> The {{circle_name}} Circle was not partially or
+                entirely filled by {{ first_name }} {{ last_name }}
+            </p>
+        {% endif %}
+
+
+    </div>
+    <hr>
+    <footer
+      id="sticky-footer"
+      class="footer fixed-bottom mt-auto py-2 dark-grey-bg text-white-50"
+      style="margin-bottom:0px"
+    >
+      <div class="container text-center">
+        <small>
+          Copyright &copy; <span class="title">XPeppers, a Claranet Group Company</span>
+        </small>
+      </div>
+    </footer>
+
+
+    {{ user_topics_values|json_script:"topic-json-data" }}
+    <script>
+      const context = JSON.parse(
+        document.getElementById("topic-json-data").textContent
+      );
+
+      for (const topic in context) {
+        let dimension_details = context[topic];
+        let dimension_names = Object.keys(dimension_details);
+        let dimension_values = Object.values(dimension_details);
+        let dimension_kind_0_values = [ dimension_values[0][0], dimension_values[1][0], dimension_values[2][0], dimension_values[3][0] ];
+        let dimension_kind_1_values = [ dimension_values[0][1], dimension_values[1][1], dimension_values[2][1], dimension_values[3][1] ];
+        let dimension_kind_2_values = [ dimension_values[0][2], dimension_values[1][2], dimension_values[2][2], dimension_values[3][2] ];
+
+        let momentum = "{{ apply_momentum_to_radar }}"
+        let next_step = "{{ apply_next_step_to_radar }}"
+        let selected_topic = "{{ selected_topic }}"
+
+        let data = [
+            {
+          type: 'scatterpolar',
+          r: dimension_kind_0_values,
+          theta: dimension_names,
+          fill: 'toself',
+          fillcolor: 'rgba(224,0,0,0.5)',
+          line : {
+                color : 'rgba(224,0,0,1)',
+                },
+          name: 'Career Landscape',}
+        ];
+
+        if (selected_topic == topic) {
+            if ( momentum == "True" ){
+                momentum_data = {
+                    type: 'scatterpolar',
+                    r: dimension_kind_1_values,
+                    theta: dimension_names,
+                    fill: 'toself',
+                    fillcolor: 'rgba(235, 174, 66,0.5)',
+                    line : {
+                        color : 'rgba(235, 174, 66,1)',
+                     },
+                    name: 'Momentum',
+                }
+                data.push(momentum_data);
+            }
+            if ( next_step == "True" ){
+                ns_data = {
+                    type: 'scatterpolar',
+                    r: dimension_kind_2_values,
+                    theta: dimension_names,
+                    fill: 'toself',
+                    fillcolor: 'rgba(78,138,90,0.5)',
+                    line : {
+                        color : 'rgba(78,138,90,1)',
+                     },
+                    name: 'Next Step',
+                }
+                data.push(ns_data);
+            }
+        }
+
+        layout = {
+          polar: {
+            radialaxis: {
+              visible: true,
+              range: [0, 5],
+              dtick: 1
+            }
+          },
+          showlegend: true
+        };
+
+        Plotly.plot(document.getElementById(topic), data, layout);
+    }
+    </script>
+
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

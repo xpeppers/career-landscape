@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <meta name="description" content="clusters">
 
+    <link rel="icon" href="{% static "clusters/images/favicon.ico" %}" />
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -19,13 +20,17 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Dosis|Kaushan+Script&display=swap"
     >
+    <link
+      rel="stylesheet"
+      href="{% static "clusters/css/style.css" %}"
+    >
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
 
   <body>
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand title" href="{% url 'clusters:index' %}">
+    <nav class="navbar sticky-top navbar-expand-lg dark-grey-bg text-white">
+      <a class="navbar-brand text-white title" href="{% url 'clusters:index' %}">
         Career Landscape
       </a>
       <button class="navbar-toggler" type="button"
@@ -37,7 +42,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link active" href="#">
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
+                Manage
+          </a>
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
             About <span class="sr-only">(current)</span>
           </a>
         </div>
@@ -45,46 +53,63 @@
     </nav>
 
     {% block content %}
+      <div class="container-fluid clearfix">
+        <div class="row p-3">
+          <div class="col-md-2"></div>
+          <div class="col-md-8">
 
-    {% if form.errors %}
-      <p>Your username and password didn't match. Please try again.</p>
-    {% endif %}
+            {% if form.errors %}
+              <div class="alert alert-danger" role="alert">
+                <p>Your username and password didn't match. Please try again.</p>
+              </div>
+            {% endif %}
 
-    {% if next %}
-      {% if user.is_authenticated %}
-        <p>Your account doesn't have access to this page. To proceed,
-        please login with an account that has access.</p>
-      {% else %}
-        <p>Please login to see this page.</p>
-      {% endif %}
-    {% endif %}
-    <p>Login:</p>
-    <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
+            {% if next %}
+              {% if user.is_authenticated %}
+                <div class="alert alert-warning" role="alert">
+                  <p>Your account doesn't have access to this page. To proceed,
+                    please login with an account that has access.</p>
+                </div>
+              {% else %}
+              <div class="alert alert-info" role="alert">
+                <p>Please login to see this page.</p>
+              </div>
+              {% endif %}
+            {% endif %}
 
-    <tr>
-      <td>{{ form.username.label_tag }}</td>
-      <td>{{ form.username }}</td>
-    </tr>
+            <div class="shadow card p-3 m-5" style="width: 18rem;">
+              <h4 class="card-title mb-2">
+                <img src="{% static "clusters/images/shield-lock-fill.svg" %}" alt="" width="38" height="38" title="Documents">
+                Login:
+              </h4>
+              <form class='mt-2' method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <table>
+                <tr>
+                  <td>{{ form.username.label_tag }}</td>
+                  <td>{{ form.username }}</td>
+                </tr>
+                <tr>
+                  <td>{{ form.password.label_tag }}</td>
+                  <td>{{ form.password }}</td>
+                </tr>
+                </table>
+                <br>
+                <input type="submit" value="login" />
+                <input type="hidden" name="next" value="{{ next }}" />
+                </form>
+            </div>
 
-    <tr>
-      <td>{{ form.password.label_tag }}</td>
-      <td>{{ form.password }}</td>
-    </tr>
-    </table>
-
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-    </form>
-
-
+          </div>
+          <div class="col-md-2"></div>
+        </div>
+      </div>
     {% endblock %}
 
 <footer
 id="sticky-footer"
-class="py-4 bg-dark text-white-50"
-style="margin-top:40px"
+class="footer fixed-bottom mt-auto py-2 dark-grey-bg text-white-50"
+style="margin-bottom:0px"
 >
 <div class="container text-center">
   <small>

@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <meta name="description" content="clusters">
 
+    <link rel="icon" href="{% static "clusters/images/favicon.ico" %}" />
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -28,8 +29,8 @@
   </head>
 
   <body>
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand title" href="{% url 'clusters:index' %}">
+    <nav class="navbar sticky-top navbar-expand-lg dark-grey-bg text-white">
+      <a class="navbar-brand text-white title" href="{% url 'clusters:index' %}">
         Career Landscape
       </a>
       <button class="navbar-toggler" type="button"
@@ -41,19 +42,20 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link active" href="{% url 'clusters:manage' %}">
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
                 Manage
           </a>
-          <a class="nav-item nav-link active" href="#">
+          <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
             About <span class="sr-only">(current)</span>
           </a>
         </div>
       </div>
       <span class="navbar-text mr-4">
+        <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
         Welcome, {{ request.user }}
       </span>
       <span class="navbar-text">
-        <a href="{% url 'logout' %}"> Logout </a>
+        <a class="text-light" href="{% url 'logout' %}"> Logout </a>
       </span>
     </nav>
 
@@ -86,23 +88,51 @@
 
         <div class="row p-4">
             <div class="col-md-4">
-              <div class="card p-3 upload" style="width: 18rem;">
-                <h4 class="card-title mb-2"> Upload .xlsx File Panel </h4>
-                <form action="{% url 'clusters:manage' %}" method="post" enctype="multipart/form-data">
+              <div class="shadow card p-3" style="width: 18rem;">
+                <h4 class="card-title">
+                    <img src="{% static "clusters/images/documents.svg" %}" alt="" width="32" height="32" title="Documents">
+                    Upload Excel
+                </h4>
+                <hr>
+                <form class='mt-2' action="{% url 'clusters:manage' %}" method="post" enctype="multipart/form-data">
                   {% csrf_token %}
-                  {{ form }}
+                  {{ upload }}
                   <br><br><input class="float-right" type="submit" value="Upload">
                 </form>
               </div>
             </div>
-            <div class="col-md-8"></div>
+            <div class="card shadow p-3 col-md-8">
+                <form action="{% url 'clusters:manage' %}" method="get">
+                    <div class="form-group">
+                        <label class='text-right' for="selected_user">
+                            <h4>
+                                <img src="{% static "clusters/images/people.svg" %}" alt="" width="38" height="38" title="Documents">
+                                 Users Career Landscapes
+                            </h4>
+                          </label>
+                          <hr>
+                          <select
+                          class=" mt-4 form-control"
+                          name="selected_user"
+                          id="selected_user"
+                          >
+                            {% for user_id, username in users.items %}
+                                <option value={{ user_id }}>
+                                  {{ username.0 }} {{ username.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="submit" value="See">
+                </form>
+            </div>
           </div>
 
     </div>
 
     <footer
       id="sticky-footer"
-      class="footer mt-auto py-4 bg-dark text-white-50"
+      class="footer fixed-bottom mt-auto py-2 dark-grey-bg text-white-50"
       style="margin-bottom:0px"
     >
       <div class="container text-center">

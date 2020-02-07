@@ -4,9 +4,7 @@
 }
 
 .card.upload {
-    background-color:rgba(70, 131, 180, 0.500);
     border-width: 2px;
-    border-color: steelblue;
 }
 
 p {
@@ -30,6 +28,38 @@ li {
     width: 50%;
 }
 
-#sticky-footer {
-    margin-top: 40px;
+.light-grey-bg {
+    background-color: rgba(200, 210, 216, 0.97);
+}
+
+.dark-grey-bg {
+    background-color: rgba(52, 69, 78, 0.97);
+}
+
+.red-bg {
+    background-color: rgba(224,0,0, 0.97);
+}
+
+.yellow-bg {
+    background-color: rgba(235, 174, 66, 0.97);
+}
+
+.green-bg {
+    background-color: rgba(78,138,90, 0.97);
+}
+
+.light-grey-bg-op {
+    background-color: rgba(200, 210, 216, 0.80);
+}
+
+.dark-grey-bg-op {
+    background-color: rgba(52, 69, 78, 0.80);
+}
+
+.red-bg-op {
+    background-color: rgba(224,0,0, 0.80);
+}
+
+.red-text {
+    color:  rgb(224,0,0);
 }
