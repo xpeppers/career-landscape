@@ -38,7 +38,7 @@
         aria-controls="navbarNavAltMarkup" aria-expanded="false"
         aria-label="Toggle navigation"
       >
-        <span class="navbar-toggler-icon"></span>
+      <img src="{% static "clusters/images/justify.svg" %}" alt="" width="32" height="32" title="Documents">
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
@@ -55,7 +55,7 @@
         Welcome, {{ request.user }}
       </span>
       <span class="navbar-text">
-        <a class="text-light" href="{% url 'logout' %}"> Logout </a>
+        <a class="text-light mr-3" href="{% url 'logout' %}"> Logout </a>
       </span>
     </nav>
 
@@ -112,7 +112,7 @@
                           </label>
                           <hr>
                           <select
-                          class=" mt-4 form-control"
+                          class="mt-4 form-control"
                           name="selected_user"
                           id="selected_user"
                           >

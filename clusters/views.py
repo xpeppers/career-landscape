@@ -10,8 +10,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 
-
-import pandas as pd
 from datetime import datetime
 
 from .forms import UploadFileForm
@@ -27,12 +25,15 @@ from .repositories import (
 
 
 class AboutView(generic.TemplateView):
-    template_name = 'clusters/about.html'
+    template_name = "clusters/about.html"
 
-@method_decorator(staff_member_required, name='dispatch')
+
+@method_decorator(staff_member_required, name="dispatch")
 class ManageView(generic.TemplateView):
     template_name = "clusters/manage.html"
-    form_classes = { 'upload' : UploadFileForm, }
+    form_classes = {
+        "upload": UploadFileForm,
+    }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -41,10 +42,10 @@ class ManageView(generic.TemplateView):
         return context
 
     def get(self, request):
-        user = self.request.GET.get('selected_user', -1)
+        user = self.request.GET.get("selected_user", -1)
         if user != -1:
-            return HttpResponseRedirect(f'/users/{user}')
-        return render(request, 'clusters/manage.html', self.get_context_data())
+            return HttpResponseRedirect(f"/users/{user}")
+        return render(request, "clusters/manage.html", self.get_context_data())
 
     def post(self, request):
         upload_form = UploadFileForm(request.POST, request.FILES)
@@ -52,23 +53,27 @@ class ManageView(generic.TemplateView):
             self.upload_form_valid(upload_form)
         else:
             self.upload_form_invalid(upload_form)
-        return HttpResponseRedirect('/manage')
+        return HttpResponseRedirect("/manage")
 
     def append_user_form_context(self, context):
-        users = { user.id : ( user.first_name , user.last_name ) for user in User.objects.all() }
-        context['users'] = users
+        users = {
+            user.id: (user.first_name, user.last_name) for user in User.objects.all()
+        }
+        context["users"] = users
         return context
 
     def upload_form_valid(self, form):
-        ExcelUploadUseCase(UserRepository(),
-                           CircleRepository(),
-                           ScoreRepository(),
-                           TopicRepository(),
-                           DimensionRepository(),
-                           self).uploadFile(form, self.request.FILES['file'].file)
+        ExcelUploadUseCase(
+            UserRepository(),
+            CircleRepository(),
+            ScoreRepository(),
+            TopicRepository(),
+            DimensionRepository(),
+            self,
+        ).uploadFile(form, self.request.FILES["file"].file)
 
     def upload_form_invalid(self, form):
-        messages.error(self.request, 'File in Upload Form is not Valid')
+        messages.error(self.request, "File in Upload Form is not Valid")
 
     def uploadSuccessful(self):
         messages.success(self.request, "Upload Success!")
@@ -101,45 +106,57 @@ class ManageView(generic.TemplateView):
         )
 
     def onDimensionRetrievalError(self, message):
-        messages.error(self.request, f'Consistency Error: {message} in xlsx file does not exists!')
+        messages.error(
+            self.request, f"Consistency Error: {message} in xlsx file does not exists!"
+        )
 
-@staff_member_required
-def userView(request, user_id):
-    context = {}
-    selected_circle = request.GET.get('selected_user_circle', -1)
-    if selected_circle != -1:
-        context['user_topics_values'] = add_circle_context(user_id, selected_circle)
-        context['circle_name'] = Circle.objects.get(id=selected_circle).name
-        context['selected_circle_id'] = Circle.objects.get(id=selected_circle).id
-    if request.GET.get('momentum', False):
-        context['selected_topic'] = request.GET.get('selected_topic')
-        context['apply_momentum_to_radar'] = True
-    if request.GET.get('next-step', False):
-        context['selected_topic'] = request.GET.get('selected_topic')
-        context['apply_next_step_to_radar'] = True
-    context['first_name'] = User.objects.get(id=user_id).first_name
-    context['last_name'] = User.objects.get(id=user_id).last_name
-    context['circles'] = list(Circle.objects.values_list('id','name'))
-    context['user_id'] = user_id
-    return render(request, 'clusters/user.html', context=context)
 
-def add_circle_context( user_id, circle_id ):
-    topic_dictionary = {}
-    person = User.objects.get(id=user_id)
-    topics = Topic.objects.filter(circle= Circle.objects.get(id=circle_id))
-    for topic in topics:
-        dimensions = Dimension.objects.filter(topic=topic)
-        dimensions_with_values = {}
-        try:
-            for dimension in dimensions:
-                value_kind_0 = Score.objects.get(person= person, dimension= dimension, kind=0).value
-                value_kind_1 = Score.objects.get(person= person, dimension= dimension, kind=1).value
-                value_kind_2 = Score.objects.get(person= person, dimension= dimension, kind=2).value
-                dimensions_with_values[dimension.name] = [value_kind_0,value_kind_1,value_kind_2]
-        except ObjectDoesNotExist as _:
-            return {}
-        topic_dictionary[topic.name] = dimensions_with_values
-    return topic_dictionary
+@method_decorator(staff_member_required, name="dispatch")
+class UserView(generic.TemplateView):
+    template_name = "clusters/users.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.kwargs["user_id"]
+        selected_circle = self.request.GET.get("selected_user_circle", -1)
+        if selected_circle != -1:
+            context["user_topics_values"] = self.add_circle_context(
+                user_id, selected_circle
+            )
+            context["circle_name"] = Circle.objects.get(id=selected_circle).name
+            context["selected_circle_id"] = Circle.objects.get(id=selected_circle).id
+        if self.request.GET.get("momentum", False):
+            context["selected_topic"] = self.request.GET.get("selected_topic")
+            context["apply_momentum_to_radar"] = True
+        if self.request.GET.get("next-step", False):
+            context["selected_topic"] = self.request.GET.get("selected_topic")
+            context["apply_next_step_to_radar"] = True
+        context["first_name"] = User.objects.get(id=user_id).first_name
+        context["last_name"] = User.objects.get(id=user_id).last_name
+        context["circles"] = list(Circle.objects.values_list("id", "name"))
+        context["user_id"] = user_id
+        return context
+
+    def add_circle_context(self, user_id, circle_id):
+        topic_dictionary = {}
+        person = User.objects.get(id=user_id)
+        topics = Topic.objects.filter(circle=Circle.objects.get(id=circle_id))
+        for topic in topics:
+            dimensions = Dimension.objects.filter(topic=topic)
+            dimensions_with_values = {}
+            try:
+                for dimension in dimensions:
+                    dimensions_with_values[dimension.name] = [
+                        Score.objects.get(
+                            person=person, dimension=dimension, kind=kind
+                        ).value
+                        for kind in range(0, 3)
+                    ]
+            except ObjectDoesNotExist as _:
+                return {}
+            topic_dictionary[topic.name] = dimensions_with_values
+        return topic_dictionary
+
 
 @method_decorator(login_required, name="dispatch")
 class IndexView(generic.TemplateView):

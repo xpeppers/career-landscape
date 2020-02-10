@@ -6,7 +6,7 @@ from . import views
 app_name = "clusters"
 urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
-    path("about/", views.AboutView.as_view(), name='about'),
+    path("about/", views.AboutView.as_view(), name="about"),
     path("manage/", views.ManageView.as_view(), name="manage"),
-    path("users/<int:user_id>", views.userView, name='users'),
+    path("users/<int:user_id>", views.UserView.as_view(), name="users"),
 ]

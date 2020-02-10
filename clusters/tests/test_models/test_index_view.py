@@ -45,21 +45,37 @@ class IndexViewTest(TestCase):
 
         response = client.get("/")
 
-        self.assertContains(response, 'topic0 : <span class="badge dark-grey-bg text-white">1</span>')
-        self.assertContains(response, 'topic1 : <span class="badge dark-grey-bg text-white">1</span>')
-        self.assertContains(response, 'topic2 : <span class="badge dark-grey-bg text-white">0</span>')
-        self.assertContains(response, 'topic3 : <span class="badge dark-grey-bg text-white">1</span>')
+        self.assertContains(
+            response, 'topic0 : <span class="badge dark-grey-bg text-white">1</span>'
+        )
+        self.assertContains(
+            response, 'topic1 : <span class="badge dark-grey-bg text-white">1</span>'
+        )
+        self.assertContains(
+            response, 'topic2 : <span class="badge dark-grey-bg text-white">0</span>'
+        )
+        self.assertContains(
+            response, 'topic3 : <span class="badge dark-grey-bg text-white">1</span>'
+        )
 
     def test_filtered_view_shows_only_selected_range_of_values(self):
         client = get_logged_staff_client()
         create_sample_with_score_values([1, 5, 4, 2])
         circle_id = Topic.objects.filter(name="topic0").first().circle.id
 
-        response = client.get("/", {f'topic_value_gt_{circle_id}' : 3})
-        self.assertContains(response, 'topic0 : <span class="badge dark-grey-bg text-white">0</span>')
-        self.assertContains(response, 'topic1 : <span class="badge dark-grey-bg text-white">1</span>')
-        self.assertContains(response, 'topic2 : <span class="badge dark-grey-bg text-white">1</span>')
-        self.assertContains(response, 'topic3 : <span class="badge dark-grey-bg text-white">0</span>')
+        response = client.get("/", {f"topic_value_gt_{circle_id}": 3})
+        self.assertContains(
+            response, 'topic0 : <span class="badge dark-grey-bg text-white">0</span>'
+        )
+        self.assertContains(
+            response, 'topic1 : <span class="badge dark-grey-bg text-white">1</span>'
+        )
+        self.assertContains(
+            response, 'topic2 : <span class="badge dark-grey-bg text-white">1</span>'
+        )
+        self.assertContains(
+            response, 'topic3 : <span class="badge dark-grey-bg text-white">0</span>'
+        )
 
     def test_filtered_view_shows_only_selected_dimensions_score(self):
         client = get_logged_staff_client()
@@ -74,8 +90,12 @@ class IndexViewTest(TestCase):
         score_second = Score(person=people[1], dimension=dimension_two, value=5)
         score_second.save()
 
-        response = client.get("/", {f'topic_dimension_eq_{circle.id}' : dimension_one.id})
-        self.assertContains(response, 'topic : <span class="badge dark-grey-bg text-white">1</span>')
+        response = client.get(
+            "/", {f"topic_dimension_eq_{circle.id}": dimension_one.id}
+        )
+        self.assertContains(
+            response, 'topic : <span class="badge dark-grey-bg text-white">1</span>'
+        )
 
     def test_index_add_expected_context(self):
         create_sample_with_score_values([1, 1, 0, 1])
@@ -86,7 +106,7 @@ class IndexViewTest(TestCase):
         index.setup(request)
 
         context = index.add_circles_context({})
-        self.assertNotEqual(context.get('circles'),None)
+        self.assertNotEqual(context.get("circles"), None)
         circle = context["circles"]
         self.assertNotEqual(circle.get("circle"), None)
 
@@ -113,8 +133,8 @@ class IndexViewTest(TestCase):
 
     def test_index_view_shows_all_circle_names(self):
         client = get_logged_staff_client()
-        circles = [ CircleFactory.create() for _ in range(4) ]
-        circles_names = [ circle.name for circle in circles ]
+        circles = [CircleFactory.create() for _ in range(4)]
+        circles_names = [circle.name for circle in circles]
 
         response = client.get("/")
 
@@ -158,26 +178,55 @@ class IndexViewTest(TestCase):
 
         response = client.get("/", {f"topic_value_gt_{first_circle.id}": 4})
 
-        self.assertContains(response, f'{first_circle_topic.name} : <span class="badge dark-grey-bg text-white">0</span>')
-        self.assertContains(response, f'{second_circle_topic.name} : <span class="badge dark-grey-bg text-white">1</span>')
+        self.assertContains(
+            response,
+            f'{first_circle_topic.name} : <span class="badge dark-grey-bg text-white">0</span>',
+        )
+        self.assertContains(
+            response,
+            f'{second_circle_topic.name} : <span class="badge dark-grey-bg text-white">1</span>',
+        )
 
-    def test_alter_circle_dimension_filter_not_alter_others_circle_dimension_filter(self):
+    def test_alter_circle_dimension_filter_not_alter_others_circle_dimension_filter(
+        self,
+    ):
         client = get_logged_staff_client()
         person = create_users(1)[0]
         first_circle = CircleFactory.create()
         second_circle = CircleFactory.create()
         first_circle_topic = TopicFactory.create(circle=first_circle)
         second_circle_topic = TopicFactory.create(circle=second_circle)
-        first_circle_dimension_populated = DimensionFactory.create(name='dimension_1', topic=first_circle_topic)
-        first_circle_dimension_empty = DimensionFactory.create(name='dimension_2', topic=first_circle_topic)
-        second_circle_dimension = DimensionFactory.create(name='dimension_1', topic=second_circle_topic)
-        first_circle_score = ScoreFactory.create(dimension=first_circle_dimension_populated, person=person)
-        second_circle_score = ScoreFactory.create(dimension=second_circle_dimension, person=person)
+        first_circle_dimension_populated = DimensionFactory.create(
+            name="dimension_1", topic=first_circle_topic
+        )
+        first_circle_dimension_empty = DimensionFactory.create(
+            name="dimension_2", topic=first_circle_topic
+        )
+        second_circle_dimension = DimensionFactory.create(
+            name="dimension_1", topic=second_circle_topic
+        )
+        first_circle_score = ScoreFactory.create(
+            dimension=first_circle_dimension_populated, person=person
+        )
+        second_circle_score = ScoreFactory.create(
+            dimension=second_circle_dimension, person=person
+        )
 
-        response = client.get("/", {f'topic_dimension_eq_{first_circle.id}' : f'{first_circle_dimension_empty.id}' })
+        response = client.get(
+            "/",
+            {
+                f"topic_dimension_eq_{first_circle.id}": f"{first_circle_dimension_empty.id}"
+            },
+        )
 
-        self.assertContains(response, f'{first_circle_topic.name} : <span class="badge dark-grey-bg text-white">0</span>')
-        self.assertContains(response, f'{second_circle_topic.name} : <span class="badge dark-grey-bg text-white">1</span>')
+        self.assertContains(
+            response,
+            f'{first_circle_topic.name} : <span class="badge dark-grey-bg text-white">0</span>',
+        )
+        self.assertContains(
+            response,
+            f'{second_circle_topic.name} : <span class="badge dark-grey-bg text-white">1</span>',
+        )
 
     def test_if_not_logged_in_IndexView_redirect_to_login_page(self):
         client = Client()

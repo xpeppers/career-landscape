@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('clusters', '0011_auto_20200129_1146'),
+        ("clusters", "0011_auto_20200129_1146"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='score',
-            name='kind',
-            field=models.IntegerField(choices=[(0, 'Career Landscape'), (1, 'Momentum'), (2, 'Next Step')], default=0),
+            model_name="score",
+            name="kind",
+            field=models.IntegerField(
+                choices=[(0, "Career Landscape"), (1, "Momentum"), (2, "Next Step")],
+                default=0,
+            ),
         ),
     ]

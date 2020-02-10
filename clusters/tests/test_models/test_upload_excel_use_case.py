@@ -29,6 +29,6 @@ class UploadExcelUseCase(TestCase):
             ],
         }
 
-        self.assertEqual(result[0]['user_name'],expected_result['user_name'])
-        self.assertEqual(result[0]['user_surname'],expected_result['user_surname'])
-        self.assertListEqual(result[0]['circles'],expected_result['circles'])
+        self.assertEqual(result[0]["user_name"], expected_result["user_name"])
+        self.assertEqual(result[0]["user_surname"], expected_result["user_surname"])
+        self.assertListEqual(result[0]["circles"], expected_result["circles"])

@@ -31,31 +31,37 @@ class ManageViewTest(TestCase):
         client = get_logged_staff_client()
         create_example_excel_file_context()
 
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/manage/',{ 'file' : xlsx_file }, follow=True)
+        with open(
+            "clusters/tests/test_models/excel_test_file/cl_example.xlsx", "rb"
+        ) as xlsx_file:
+            response = client.post("/manage/", {"file": xlsx_file}, follow=True)
 
         scores = Score.objects.filter(kind=0)
-        self.assertEqual(len(scores),8)
+        self.assertEqual(len(scores), 8)
 
     def test_manage_view_shows_correct_upload_file_message_if_success(self):
         client = get_logged_staff_client()
         xlsx_file = create_example_excel_file_context()
 
-        with open('clusters/tests/test_models/excel_test_file/cl_example.xlsx','rb') as xlsx_file:
-            response = client.post('/manage/', { 'file' : xlsx_file }, follow=True)
+        with open(
+            "clusters/tests/test_models/excel_test_file/cl_example.xlsx", "rb"
+        ) as xlsx_file:
+            response = client.post("/manage/", {"file": xlsx_file}, follow=True)
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), "Upload Success!")
 
-    def test_manage_view_shows_correct_upload_file_message_if_fail_with_wrong_file_post(self):
+    def test_manage_view_shows_correct_upload_file_message_if_fail_with_wrong_file_post(
+        self,
+    ):
         client = get_logged_staff_client()
-        xlsx_file = 'false_file'
-        response = client.post('/manage/', { 'file' : xlsx_file })
+        xlsx_file = "false_file"
+        response = client.post("/manage/", {"file": xlsx_file})
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'File in Upload Form is not Valid')
+        self.assertEqual(str(messages[0]), "File in Upload Form is not Valid")
 
     def test_manage_view_upload_file_with_not_registered_user_shows_error_message(self):
         client = get_logged_staff_client()
@@ -74,7 +80,12 @@ class ManageViewTest(TestCase):
 
     def test_manage_view_upload_file_with_no_circle_in_db_shows_error_message(self):
         client = get_logged_staff_client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user = UserFactory.build(
+            username="username",
+            first_name="user_name",
+            last_name="user_surname",
+            password="us_test_ps_w",
+        )
         user.save()
 
         with open(
@@ -90,7 +101,12 @@ class ManageViewTest(TestCase):
 
     def test_manage_view_upload_file_with_not_registered_data_shows_error_message(self):
         client = get_logged_staff_client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user = UserFactory.build(
+            username="username",
+            first_name="user_name",
+            last_name="user_surname",
+            password="us_test_ps_w",
+        )
         user.save()
         circle = CircleFactory.create(name="Circle")
 
@@ -151,7 +167,12 @@ class ManageViewTest(TestCase):
 
     def test_manage_view_upload_with_error_caused_by_homonymous_User(self):
         client = get_logged_staff_client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user = UserFactory.build(
+            username="username",
+            first_name="user_name",
+            last_name="user_surname",
+            password="us_test_ps_w",
+        )
         user.save()
         user_homonymous = UserFactory.build(
             username="username_homonymous",
@@ -175,7 +196,12 @@ class ManageViewTest(TestCase):
 
     def test_manage_view_upload_with_bad_circle_in_excel(self):
         client = get_logged_staff_client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user = UserFactory.build(
+            username="username",
+            first_name="user_name",
+            last_name="user_surname",
+            password="us_test_ps_w",
+        )
         user.save()
         circle = CircleFactory.create(name="Circle_wrong")
 
@@ -186,11 +212,21 @@ class ManageViewTest(TestCase):
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Consistency Error: Circle <Circle> in xlsx file does not exists!')
+        self.assertEqual(
+            str(messages[0]),
+            "Consistency Error: Circle <Circle> in xlsx file does not exists!",
+        )
 
-    def test_manage_view_upload_file_with_not_existing_dimension_shows_error_message(self):
+    def test_manage_view_upload_file_with_not_existing_dimension_shows_error_message(
+        self,
+    ):
         client = get_logged_staff_client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user = UserFactory.build(
+            username="username",
+            first_name="user_name",
+            last_name="user_surname",
+            password="us_test_ps_w",
+        )
         user.save()
         circle = CircleFactory.create(name="Circle")
         topic_one = TopicFactory.create(name="topic1", circle=circle)
@@ -212,31 +248,46 @@ class ManageViewTest(TestCase):
         client = get_logged_staff_client()
         xlsx_file = create_example_excel_file_topics_numbers()
 
-        with open('clusters/tests/test_models/excel_test_file/cl_example_topics_disparity.xlsx','rb') as xlsx_file:
-            response = client.post('/manage/', { 'file' : xlsx_file }, follow=True)
+        with open(
+            "clusters/tests/test_models/excel_test_file/cl_example_topics_disparity.xlsx",
+            "rb",
+        ) as xlsx_file:
+            response = client.post("/manage/", {"file": xlsx_file}, follow=True)
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Upload Success!')
+        self.assertEqual(str(messages[0]), "Upload Success!")
 
     def test_manage_view_shows_users_form(self):
         client = get_logged_staff_client()
-        users = [ UserFactory.build(username= f'username{i}', password = f'blabla{i}', first_name=f'username{i}' ) for i in range(3)]
+        users = [
+            UserFactory.build(
+                username=f"username{i}",
+                password=f"blabla{i}",
+                first_name=f"username{i}",
+            )
+            for i in range(3)
+        ]
         for user in users:
             user.save()
 
-        response = client.get('/manage/')
+        response = client.get("/manage/")
 
         for i in range(3):
-            self.assertContains(response, f'username{i}')
+            self.assertContains(response, f"username{i}")
 
     def test_manage_view_redirect_to_userview_after_selecting_a_user(self):
         client = get_logged_staff_client()
-        user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+        user = UserFactory.build(
+            username="username",
+            first_name="user_name",
+            last_name="user_surname",
+            password="us_test_ps_w",
+        )
         user.save()
 
-        response = client.get('/manage/', { 'selected_user' : user.id }, follow=True )
+        response = client.get("/manage/", {"selected_user": user.id}, follow=True)
 
-        self.assertContains(response,user.first_name)
-        self.assertContains(response,user.last_name)
-        self.assertRedirects(response, f'/users/{user.id}', status_code=302 )
+        self.assertContains(response, user.first_name)
+        self.assertContains(response, user.last_name)
+        self.assertRedirects(response, f"/users/{user.id}", status_code=302)

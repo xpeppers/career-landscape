@@ -54,22 +54,47 @@ def create_example_excel_file_context():
 
 
 def create_example_excel_file_topics_numbers():
-    user = UserFactory.build(username='username', first_name='user_name', last_name='user_surname', password='us_test_ps_w')
+    user = UserFactory.build(
+        username="username",
+        first_name="user_name",
+        last_name="user_surname",
+        password="us_test_ps_w",
+    )
     user.save()
-    circle1 = CircleFactory.create(name='Circle1')
-    circle2 = CircleFactory.create(name='Circle2')
-    topics1 = [ TopicFactory.create(name=f"topic{i}", circle=circle1) for i in range(1,3) ]
-    topics2 = [ TopicFactory.create(name=f"topic{i}", circle=circle2) for i in range(1,4) ]
-    dimension1_topic_1 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics1[0]) for i in range(1,5) ]
-    dimension1_topic_2 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics1[1]) for i in range(1,5) ]
-    dimension2_topic_1 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics2[0]) for i in range(1,5) ]
-    dimension2_topic_2 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics2[1]) for i in range(1,5) ]
-    dimension2_topic_3 = [ DimensionFactory.create(name=f"dimension{i}", topic=topics2[2]) for i in range(1,5) ]
+    circle1 = CircleFactory.create(name="Circle1")
+    circle2 = CircleFactory.create(name="Circle2")
+    topics1 = [
+        TopicFactory.create(name=f"topic{i}", circle=circle1) for i in range(1, 3)
+    ]
+    topics2 = [
+        TopicFactory.create(name=f"topic{i}", circle=circle2) for i in range(1, 4)
+    ]
+    dimension1_topic_1 = [
+        DimensionFactory.create(name=f"dimension{i}", topic=topics1[0])
+        for i in range(1, 5)
+    ]
+    dimension1_topic_2 = [
+        DimensionFactory.create(name=f"dimension{i}", topic=topics1[1])
+        for i in range(1, 5)
+    ]
+    dimension2_topic_1 = [
+        DimensionFactory.create(name=f"dimension{i}", topic=topics2[0])
+        for i in range(1, 5)
+    ]
+    dimension2_topic_2 = [
+        DimensionFactory.create(name=f"dimension{i}", topic=topics2[1])
+        for i in range(1, 5)
+    ]
+    dimension2_topic_3 = [
+        DimensionFactory.create(name=f"dimension{i}", topic=topics2[2])
+        for i in range(1, 5)
+    ]
+
 
 def get_logged_staff_client():
-    username='myuser'
-    password='myusmypass'
-    user = UserFactory.build( username=username, password=password, is_staff=True )
+    username = "myuser"
+    password = "myusmypass"
+    user = UserFactory.build(username=username, password=password, is_staff=True)
     user.save()
     client = Client()
     client.login(username=username, password=password)

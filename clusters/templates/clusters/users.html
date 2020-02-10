@@ -33,12 +33,11 @@
       <a class="navbar-brand text-white title" href="{% url 'clusters:index' %}">
         Career Landscape
       </a>
-      <button class="navbar-toggler" type="button"
+      <button class="navbar-toggler type="button"
         data-toggle="collapse" data-target="#navbarNavAltMarkup"
         aria-controls="navbarNavAltMarkup" aria-expanded="false"
         aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
+      ><img src="{% static "clusters/images/justify.svg" %}" alt="" width="32" height="32" title="Documents">
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
@@ -55,7 +54,7 @@
         Welcome, {{ request.user }}
       </span>
       <span class="navbar-text">
-        <a class="text-light" href="{% url 'logout' %}"> Logout </a>
+        <a class="text-light mr-3" href="{% url 'logout' %}"> Logout </a>
       </span>
     </nav>
 
@@ -71,24 +70,28 @@
                 </h3>
                 <hr>
                 <form action="{% url 'clusters:users' user_id %}" method="get">
-                    <div class="form-group">
-                        <label for="selected_user_circle">
-                            <h5>
-                                <img src="{% static "clusters/images/circle-half.svg" %}" alt="" width="30" height="30" title="Documents">
-                                User Circles
-                            </h5>
-                          </label>
-                          <select
-                          class="form-control"
-                          name="selected_user_circle"
-                          id="selected_user_circle"
-                          >
-                            {% for circle_id, circle_name in circles %}
-                                <option value={{ circle_id }}>
-                                  {{ circle_name }} Circle
-                                </option>
-                            {% endfor %}
-                        </select>
+                  <label for="selected_user_circle">
+                    <h5>
+                        <img src="{% static "clusters/images/circle-half.svg" %}" alt="" width="30" height="30" title="Documents">
+                        User Circles
+                    </h5>
+                  </label><br>
+                    <div class="d-flex justify-content-center form-group">
+                        <div class="btn-group btn-group-toggle p-2" data-toggle="buttons">
+                          {% for circle_id, this_circle_name in circles %}
+                            {% if user_topics_values and circle_name == this_circle_name %}
+                              <label class="rounded btn red-bg-op text-white active p-2 m-1">
+                                <input type="radio" name="selected_user_circle" value={{ circle_id }} autocomplete="off">
+                                  {{ this_circle_name }} Circle
+                              </label>
+                            {% else %}
+                              <label class="rounded btn dark-grey-bg-op text-white p-2 m-1">
+                                <input type="radio" name="selected_user_circle" value={{ circle_id }} autocomplete="off">
+                                  {{ this_circle_name }} Circle
+                              </label>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
                     </div>
                     <input type="submit" value="See Circle">
                 </form>
