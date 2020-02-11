@@ -18,7 +18,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -123,5 +122,8 @@ provision/.DS_Store
 
 ### Vagrant ###
 .vagrant/
+
+### Seed ###
+fixtures/career_landscape_seed.json
 
 # End of https://www.gitignore.io/api/python,visualstudiocode

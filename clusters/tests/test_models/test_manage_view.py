@@ -1,5 +1,4 @@
-from django.test import RequestFactory, TestCase, Client
-from django.db.utils import IntegrityError
+from django.test import RequestFactory, TestCase, Client, TransactionTestCase
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 
@@ -12,21 +11,7 @@ from clusters.tests.factories.topic import TopicFactory
 from clusters.tests.factories.dimension import DimensionFactory
 
 
-class MockListener:
-    def uploadSuccessful(self, message):
-        return
-
-    def dataNotParsed(self):
-        return
-
-    def badFileFormat(self):
-        return
-
-    def uploadUnsuccessful(self, message):
-        return
-
-
-class ManageViewTest(TestCase):
+class ManageViewTest(TransactionTestCase):
     def test_manage_upload_xlsx_file_and_load_data(self):
         client = get_logged_staff_client()
         create_example_excel_file_context()
@@ -162,7 +147,7 @@ class ManageViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             str(messages[0]),
-            "Error in xlsx file datas: Data not correct ( correct data format: dd-mm-yyyy ) ",
+            "Error in xlsx file datas: Data not correct ( correct data format: dd/mm/yyyy ) ",
         )
 
     def test_manage_view_upload_with_error_caused_by_homonymous_User(self):
@@ -291,3 +276,14 @@ class ManageViewTest(TestCase):
         self.assertContains(response, user.first_name)
         self.assertContains(response, user.last_name)
         self.assertRedirects(response, f"/users/{user.id}", status_code=302)
+
+    def test_manage_view_avoid_inconsistent_db_state_if_bad_excel(self):
+        client = get_logged_staff_client()
+        xlsx_file = create_example_excel_file_context()
+
+        with open(
+            "clusters/tests/test_models/excel_test_file/cl_inconsistent_example.xlsx", "rb"
+        ) as xlsx_file:
+            response = client.post("/manage/", {"file": xlsx_file}, follow=True)
+
+        self.assertEqual(len(Score.objects.all()),0)

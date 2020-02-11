@@ -6,7 +6,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 class UserRepository:
     def get_user_by_first_name_and_last_name(self, first_name, last_name):
         try:
-            return User.objects.get(first_name=first_name, last_name=last_name)
+            return User.objects.get(first_name__iexact=first_name, last_name__iexact=last_name)
         except ObjectDoesNotExist as _:
             return None
         except MultipleObjectsReturned as _:
@@ -19,7 +19,7 @@ class CircleRepository:
 
     def get_circle_by_name(self, name):
         try:
-            return Circle.objects.get(name=name)
+            return Circle.objects.get(name__iexact=name)
         except Circle.DoesNotExist as _:
             return None
 
@@ -38,7 +38,7 @@ class ScoreRepository:
 class TopicRepository:
     def get_topic_by_name_and_circle(self, name, circle):
         try:
-            return Topic.objects.get(circle=circle, name=name)
+            return Topic.objects.get(circle=circle, name__iexact=name)
         except Topic.DoesNotExist as _:
             return None
 
@@ -46,6 +46,6 @@ class TopicRepository:
 class DimensionRepository:
     def get_dimension_by_name_and_topic(self, name, topic):
         try:
-            return Dimension.objects.get(topic=topic, name=name)
+            return Dimension.objects.get(topic=topic, name__iexact=name)
         except Dimension.DoesNotExist as _:
             return None

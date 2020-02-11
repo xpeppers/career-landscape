@@ -1,7 +1,10 @@
 import pandas as pd
 
 from datetime import datetime
+from dateutil.parser import parse
 
+# cercare di rimuovere la dipendeza da Django
+from django.db import transaction
 
 class ExcelUploadUseCase:
     user_repository = None
@@ -27,7 +30,8 @@ class ExcelUploadUseCase:
         self.dimension_repository = dimension_repository
         self.listener = listener
 
-    def uploadFile(self, form, file):
+    @transaction.atomic
+    def uploadFile(self, file):
         try:
             parsed_sheets = self.Parser().parse_xlsx(
                 file, self.circle_repository.get_all_circles()
@@ -37,41 +41,45 @@ class ExcelUploadUseCase:
             return
         if not parsed_sheets:
             self.listener.dataNotParsed()
+            return  
+        try:
+            with transaction.atomic():
+                for sheet in parsed_sheets:
+                    self.save_new_scores(sheet)
+        except Exception as e:
             return
-        for sheet in parsed_sheets:
-            correct_save = self.save_new_scores(sheet)
-            if not correct_save:
-                return
-        self.listener.uploadSuccessful()
+        else:
+            self.listener.uploadSuccessful()
 
     def save_new_scores(self, parsed_data):
         try:
-            date = datetime.strptime(parsed_data["compilation_date"], "%d-%m-%Y")
+            datetime.strptime(str(parsed_data["compilation_date"]), '%Y-%m-%d 00:00:00')
+            date = parsed_data["compilation_date"]
         except ValueError as _:
             self.listener.dataError()
-            return False
+            raise Exception
         person = self.user_repository.get_user_by_first_name_and_last_name(
             parsed_data["user_name"], parsed_data["user_surname"]
         )
         if person is None:
             self.listener.userError()
-            return False
+            raise Exception
         circles = parsed_data["circles"]
         if not circles:
             self.listener.noCircleInDatabase()
-            return False
+            raise Exception
         for circle in circles:
             for circle_name, topic_name, dimension_name, value in circle:
                 circle = self.circle_repository.get_circle_by_name(circle_name)
                 if circle is None:
                     self.listener.onDimensionRetrievalError(f"Circle <{circle_name}>")
-                    return False
+                    raise Exception
                 topic = self.topic_repository.get_topic_by_name_and_circle(
                     topic_name, circle
                 )
                 if topic is None:
                     self.listener.onDimensionRetrievalError(f"Topic <{topic_name}>")
-                    return False
+                    raise Exception
                 dimension = self.dimension_repository.get_dimension_by_name_and_topic(
                     dimension_name, topic
                 )
@@ -79,7 +87,7 @@ class ExcelUploadUseCase:
                     self.listener.onDimensionRetrievalError(
                         f"Dimension <{dimension_name}>"
                     )
-                    return False
+                    raise Exception
                 self.score_repository.save_score(
                     dimension=dimension,
                     person=person,
@@ -87,7 +95,6 @@ class ExcelUploadUseCase:
                     date=date,
                     kind=parsed_data["kind"],
                 )
-        return True
 
     class Parser:
         def parse_xlsx(self, file, circles, sheets_numbers=[0, 2, 3]):

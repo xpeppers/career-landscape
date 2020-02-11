@@ -52,7 +52,7 @@
       </div>
       <span class="navbar-text mr-4">
         <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
-        Welcome, {{ request.user }}
+        Welcome, <i>{{ request.user }}</i>
       </span>
       <span class="navbar-text">
         <a class="text-light mr-3" href="{% url 'logout' %}"> Logout </a>

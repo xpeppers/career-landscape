@@ -51,7 +51,7 @@
       </div>
       <span class="navbar-text mr-4">
         <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
-        Welcome, {{ request.user }}
+        Welcome, <i>{{ request.user }}</i>
       </span>
       <span class="navbar-text">
         <a class="text-light mr-3" href="{% url 'logout' %}"> Logout </a>
@@ -136,28 +136,6 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                                <br>
-                                <form action="{% url 'clusters:users' user_id %}" method="get">
-                                    <div class="form-check form-check-inline">
-                                        {% if apply_momentum_to_radar and selected_topic == topic %}
-                                        <input class="form-check-input" type="checkbox" name='momentum' checked>
-                                        {% else %}
-                                        <input class="form-check-input" type="checkbox" name='momentum'>
-                                        {% endif %}
-                                        <label class="form-check-label" for="momentum">Show Momentum Values</label>
-                                    </div><br>
-                                    <div class="form-check form-check-inline">
-                                        {% if apply_next_step_to_radar and selected_topic == topic %}
-                                            <input class="form-check-input" type="checkbox" name='next-step' checked>
-                                        {% else %}
-                                            <input class="form-check-input" type="checkbox" name='next-step'>
-                                        {% endif %}
-                                        <label class="form-check-label" for="next-step">Show Next Step Values</label>
-                                    </div>
-                                    <input type="hidden" name="selected_user_circle" value="{{selected_circle_id}}">
-                                    <input type="hidden" name="selected_topic" value="{{topic}}">
-                                    <button type="submit" class="btn dark-grey-bg text-white btn-sm float-right">Show me</button>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -223,39 +201,35 @@
           line : {
                 color : 'rgba(224,0,0,1)',
                 },
-          name: 'Career Landscape',}
+          name: 'Actual',}
         ];
 
-        if (selected_topic == topic) {
-            if ( momentum == "True" ){
-                momentum_data = {
-                    type: 'scatterpolar',
-                    r: dimension_kind_1_values,
-                    theta: dimension_names,
-                    fill: 'toself',
-                    fillcolor: 'rgba(235, 174, 66,0.5)',
-                    line : {
-                        color : 'rgba(235, 174, 66,1)',
-                     },
-                    name: 'Momentum',
-                }
-                data.push(momentum_data);
-            }
-            if ( next_step == "True" ){
-                ns_data = {
-                    type: 'scatterpolar',
-                    r: dimension_kind_2_values,
-                    theta: dimension_names,
-                    fill: 'toself',
-                    fillcolor: 'rgba(78,138,90,0.5)',
-                    line : {
-                        color : 'rgba(78,138,90,1)',
-                     },
-                    name: 'Next Step',
-                }
-                data.push(ns_data);
-            }
+
+        momentum_data = {
+            type: 'scatterpolar',
+            r: dimension_kind_1_values,
+            theta: dimension_names,
+            fill: 'toself',
+            fillcolor: 'rgba(235, 174, 66,0.5)',
+            line : {
+                color : 'rgba(235, 174, 66,1)',
+              },
+            name: 'Momentum',
         }
+        data.push(momentum_data);
+
+        ns_data = {
+            type: 'scatterpolar',
+            r: dimension_kind_2_values,
+            theta: dimension_names,
+            fill: 'toself',
+            fillcolor: 'rgba(78,138,90,0.5)',
+            line : {
+                color : 'rgba(78,138,90,1)',
+              },
+            name: 'NextStep',
+        }
+        data.push(ns_data);
 
         layout = {
           polar: {
