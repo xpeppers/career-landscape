@@ -1,6 +1,7 @@
 from django.db import models
 from clusters.models.circle_model import Circle
 
+
 class Topic(models.Model):
     name = models.CharField(max_length=500)
     circle = models.ForeignKey(Circle, on_delete=models.CASCADE)

@@ -6,7 +6,9 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 class UserRepository:
     def get_user_by_first_name_and_last_name(self, first_name, last_name):
         try:
-            return User.objects.get(first_name__iexact=first_name, last_name__iexact=last_name)
+            return User.objects.get(
+                first_name__iexact=first_name, last_name__iexact=last_name
+            )
         except ObjectDoesNotExist as _:
             return None
         except MultipleObjectsReturned as _:

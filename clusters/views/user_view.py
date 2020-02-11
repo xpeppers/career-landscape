@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from clusters.models import Circle, Topic, Dimension, Score
 
+
 @method_decorator(staff_member_required, name="dispatch")
 class UserView(generic.TemplateView):
     template_name = "clusters/users.html"
@@ -45,4 +46,3 @@ class UserView(generic.TemplateView):
                 return {}
             topic_dictionary[topic.name] = dimensions_with_values
         return topic_dictionary
-

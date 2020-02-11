@@ -6,6 +6,7 @@ from dateutil.parser import parse
 # cercare di rimuovere la dipendeza da Django
 from django.db import transaction
 
+
 class ExcelUploadUseCase:
     user_repository = None
     circle_repository = None
@@ -41,7 +42,7 @@ class ExcelUploadUseCase:
             return
         if not parsed_sheets:
             self.listener.dataNotParsed()
-            return  
+            return
         try:
             with transaction.atomic():
                 for sheet in parsed_sheets:
@@ -53,7 +54,7 @@ class ExcelUploadUseCase:
 
     def save_new_scores(self, parsed_data):
         try:
-            datetime.strptime(str(parsed_data["compilation_date"]), '%Y-%m-%d 00:00:00')
+            datetime.strptime(str(parsed_data["compilation_date"]), "%Y-%m-%d 00:00:00")
             date = parsed_data["compilation_date"]
         except ValueError as _:
             self.listener.dataError()

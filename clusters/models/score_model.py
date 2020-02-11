@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from clusters.models.dimension_model import Dimension
 
+
 class Score(models.Model):
     class KindOfScore(models.IntegerChoices):
         CAREER_LANDSCAPE = 0

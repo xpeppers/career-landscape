@@ -282,8 +282,9 @@ class ManageViewTest(TransactionTestCase):
         xlsx_file = create_example_excel_file_context()
 
         with open(
-            "clusters/tests/test_models/excel_test_file/cl_inconsistent_example.xlsx", "rb"
+            "clusters/tests/test_models/excel_test_file/cl_inconsistent_example.xlsx",
+            "rb",
         ) as xlsx_file:
             response = client.post("/manage/", {"file": xlsx_file}, follow=True)
 
-        self.assertEqual(len(Score.objects.all()),0)
+        self.assertEqual(len(Score.objects.all()), 0)

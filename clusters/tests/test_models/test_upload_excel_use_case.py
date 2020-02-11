@@ -36,6 +36,7 @@ class MockListener:
     def onDimensionRetrievalError(self, message):
         return
 
+
 class UploadExcelUseCase(TestCase):
     def test_parse_xlsx_correct_import_datas_from_dataframe(self):
         circle = CircleFactory.create()
@@ -66,24 +67,34 @@ class UploadExcelUseCase(TestCase):
         self.assertListEqual(result[0]["circles"], expected_result["circles"])
 
     def test_retrieve_object_ignoring_case(self):
-        user = User(username='user', first_name='mario', last_name='rossi', password='blablabla')
+        user = User(
+            username="user", first_name="mario", last_name="rossi", password="blablabla"
+        )
         user.save()
-        circle = CircleFactory.create(name='circle')
-        topics = [ TopicFactory.create(name=f'Topic{i}', circle=circle) for i in range(1,3) ]
-        dimensions1 = [ DimensionFactory.create(name=f'diMension{i}', topic=topics[0]) for i in range(1,5) ]
-        dimensions2 = [ DimensionFactory.create(name=f'dimenSion{i}', topic=topics[1]) for i in range(1,5) ]
+        circle = CircleFactory.create(name="circle")
+        topics = [
+            TopicFactory.create(name=f"Topic{i}", circle=circle) for i in range(1, 3)
+        ]
+        dimensions1 = [
+            DimensionFactory.create(name=f"diMension{i}", topic=topics[0])
+            for i in range(1, 5)
+        ]
+        dimensions2 = [
+            DimensionFactory.create(name=f"dimenSion{i}", topic=topics[1])
+            for i in range(1, 5)
+        ]
 
         with open(
             "clusters/tests/test_models/excel_test_file/cl_example_2.xlsx", "rb"
         ) as xlsx_file:
             ExcelUploadUseCase(
-            UserRepository(),
-            CircleRepository(),
-            ScoreRepository(),
-            TopicRepository(),
-            DimensionRepository(),
-            MockListener(),
-             ).uploadFile(xlsx_file)
+                UserRepository(),
+                CircleRepository(),
+                ScoreRepository(),
+                TopicRepository(),
+                DimensionRepository(),
+                MockListener(),
+            ).uploadFile(xlsx_file)
 
         scores = Score.objects.all()
 

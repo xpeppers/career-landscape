@@ -17,6 +17,7 @@ from clusters.repositories import (
     DimensionRepository,
 )
 
+
 @method_decorator(staff_member_required, name="dispatch")
 class ManageView(generic.TemplateView):
     template_name = "clusters/manage.html"
@@ -46,7 +47,8 @@ class ManageView(generic.TemplateView):
 
     def append_user_form_context(self, context):
         users = {
-            user.id: (user.first_name, user.last_name) for user in User.objects.filter(is_staff=False)
+            user.id: (user.first_name, user.last_name)
+            for user in User.objects.filter(is_staff=False)
         }
         context["users"] = users
         return context

@@ -1,6 +1,7 @@
 from django.db import models
 from clusters.models.topic_model import Topic
 
+
 class Dimension(models.Model):
     name = models.CharField(max_length=200)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)

@@ -88,5 +88,3 @@ class UserViewTest(TestCase):
         self.assertContains(response, " - information not available - ")
         self.assertContains(response, f"The {circle_name} Circle")
         self.assertContains(response, f"by { user_first_name } { user_last_name }")
-
-
