@@ -125,6 +125,7 @@ provision/.DS_Store
 
 ### Seed ###
 fixtures/career_landscape_seed.json
+fixtures/claranet_seed.json
 
 ### Excel ###
 clusters/tests/test_models/excel_test_file/Career_*
