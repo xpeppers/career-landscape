@@ -65,11 +65,18 @@
             <div class=" shadow card p-3 col-md-12">
                 <h3 class="text-justify title text-center">
                     <img src="{% static "clusters/images/chevron-compact-left.svg" %}" alt="" width="38" height="38" title="Documents">
-                   {{ first_name }} {{ last_name }}
+                   {{ first_name|title }} {{ last_name|title }}
                    <img src="{% static "clusters/images/chevron-compact-right.svg" %}" alt="" width="38" height="38" title="Documents">
                 </h3>
                 <hr>
                 <form action="{% url 'clusters:users' user_id %}" method="get">
+                  {% if compilation_date %}
+                    <div class="float-right pr-2 pl-2">
+                      <p> Last Update:
+                        {{ compilation_date|date:"j/n/Y" }}
+                      </p>
+                    </div>
+                  {% endif %}
                   <label for="selected_user_circle">
                     <h5>
                         <img src="{% static "clusters/images/circle-half.svg" %}" alt="" width="30" height="30" title="Documents">

@@ -3,9 +3,6 @@ import pandas as pd
 from datetime import datetime
 from dateutil.parser import parse
 
-# cercare di rimuovere la dipendeza da Django
-from django.db import transaction
-
 
 class ExcelUploadUseCase:
     user_repository = None
@@ -13,6 +10,7 @@ class ExcelUploadUseCase:
     score_repository = None
     topic_repository = None
     dimension_repository = None
+    transaction_manager = None
     listener = None
 
     def __init__(
@@ -22,6 +20,7 @@ class ExcelUploadUseCase:
         score_repository,
         topic_repository,
         dimension_repository,
+        transaction_manager,
         listener,
     ):
         self.user_repository = user_repository
@@ -29,9 +28,9 @@ class ExcelUploadUseCase:
         self.score_repository = score_repository
         self.topic_repository = topic_repository
         self.dimension_repository = dimension_repository
+        self.transaction_manager = transaction_manager
         self.listener = listener
 
-    @transaction.atomic
     def uploadFile(self, file):
         try:
             parsed_sheets = self.Parser().parse_xlsx(
@@ -44,9 +43,7 @@ class ExcelUploadUseCase:
             self.listener.dataNotParsed()
             return
         try:
-            with transaction.atomic():
-                for sheet in parsed_sheets:
-                    self.save_new_scores(sheet)
+            self.transaction_manager.apply_transaction(parsed_sheets, self)
         except Exception as e:
             return
         else:

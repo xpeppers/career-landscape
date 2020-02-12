@@ -11,6 +11,7 @@ from clusters.repositories import (
     ScoreRepository,
     TopicRepository,
     DimensionRepository,
+    TransactionManager,
 )
 
 
@@ -93,6 +94,7 @@ class UploadExcelUseCase(TestCase):
                 ScoreRepository(),
                 TopicRepository(),
                 DimensionRepository(),
+                TransactionManager(),
                 MockListener(),
             ).uploadFile(xlsx_file)
 

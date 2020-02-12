@@ -33,15 +33,15 @@ class UserViewTest(TestCase):
 
     def test_user_view_display_user_first_and_last_name(self):
         client = get_logged_staff_client()
-        first_name = "user_f_n"
-        last_name = "user_l_n"
+        first_name = "userFirstName"
+        last_name = "userLastName"
         user = UserFactory.build(first_name=first_name, last_name=last_name)
         user.save()
 
         response = client.get(f"/users/{user.id}", follow=True)
 
-        self.assertContains(response, first_name)
-        self.assertContains(response, last_name)
+        self.assertContains(response, first_name.capitalize())
+        self.assertContains(response, last_name.capitalize())
 
     def test_user_view_display_circles_names(self):
         client = get_logged_staff_client()

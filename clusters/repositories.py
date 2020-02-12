@@ -1,6 +1,15 @@
 from .models import Circle, Score, Topic, Dimension
 from django.contrib.auth.models import User
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db import transaction
+
+
+class TransactionManager:
+    @transaction.atomic
+    def apply_transaction(self, parsed_sheets, saver):
+        with transaction.atomic():
+            for sheet in parsed_sheets:
+                saver.save_new_scores(sheet)
 
 
 class UserRepository:

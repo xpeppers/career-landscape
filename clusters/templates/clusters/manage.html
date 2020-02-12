@@ -118,7 +118,7 @@
                           >
                             {% for user_id, username in users.items %}
                                 <option value={{ user_id }}>
-                                  {{ username.0 }} {{ username.1 }}
+                                  {{ username.0|title }} {{ username.1|title }}
                                 </option>
                             {% endfor %}
                         </select>

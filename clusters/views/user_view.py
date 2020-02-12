@@ -21,10 +21,15 @@ class UserView(generic.TemplateView):
             )
             context["circle_name"] = Circle.objects.get(id=selected_circle).name
             context["selected_circle_id"] = Circle.objects.get(id=selected_circle).id
-        context["first_name"] = User.objects.get(id=user_id).first_name
-        context["last_name"] = User.objects.get(id=user_id).last_name
+        person = User.objects.get(id=user_id)
+        context["first_name"] = person.first_name
+        context["last_name"] = person.last_name
         context["circles"] = list(Circle.objects.values_list("id", "name"))
         context["user_id"] = user_id
+        if Score.objects.filter(person=person).exists():
+            context["compilation_date"] = (
+                Score.objects.filter(person=person).first().date
+            )
         return context
 
     def add_circle_context(self, user_id, circle_id):

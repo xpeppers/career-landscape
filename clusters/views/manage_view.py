@@ -15,6 +15,7 @@ from clusters.repositories import (
     ScoreRepository,
     TopicRepository,
     DimensionRepository,
+    TransactionManager,
 )
 
 
@@ -60,6 +61,7 @@ class ManageView(generic.TemplateView):
             ScoreRepository(),
             TopicRepository(),
             DimensionRepository(),
+            TransactionManager(),
             self,
         ).uploadFile(self.request.FILES["file"].file)
 

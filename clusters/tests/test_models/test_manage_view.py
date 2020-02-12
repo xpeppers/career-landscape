@@ -259,22 +259,22 @@ class ManageViewTest(TransactionTestCase):
         response = client.get("/manage/")
 
         for i in range(3):
-            self.assertContains(response, f"username{i}")
+            self.assertContains(response, f"username{i}".capitalize())
 
     def test_manage_view_redirect_to_userview_after_selecting_a_user(self):
         client = get_logged_staff_client()
         user = UserFactory.build(
             username="username",
-            first_name="user_name",
-            last_name="user_surname",
+            first_name="userFirstName",
+            last_name="userLastName",
             password="us_test_ps_w",
         )
         user.save()
 
         response = client.get("/manage/", {"selected_user": user.id}, follow=True)
 
-        self.assertContains(response, user.first_name)
-        self.assertContains(response, user.last_name)
+        self.assertContains(response, user.first_name.capitalize())
+        self.assertContains(response, user.last_name.capitalize())
         self.assertRedirects(response, f"/users/{user.id}", status_code=302)
 
     def test_manage_view_avoid_inconsistent_db_state_if_bad_excel(self):

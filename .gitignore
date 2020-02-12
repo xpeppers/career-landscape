@@ -126,4 +126,7 @@ provision/.DS_Store
 ### Seed ###
 fixtures/career_landscape_seed.json
 
+### Excel ###
+clusters/tests/test_models/excel_test_file/Career_*
+
 # End of https://www.gitignore.io/api/python,visualstudiocode
