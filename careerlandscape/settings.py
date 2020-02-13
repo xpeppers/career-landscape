@@ -83,8 +83,8 @@ WSGI_APPLICATION = "careerlandscape.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
-DATABASES['default']['ENGINE'] = "django.db.backends.postgresql_psycopg2"
+DATABASES["default"] = dj_database_url.config(conn_max_age=600)
+DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql_psycopg2"
 
 
 # Password validation
