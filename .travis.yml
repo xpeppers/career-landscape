@@ -32,9 +32,8 @@ script:
 
 deploy:
   provider: heroku:git
-  api_key:
-    secure: Y63BXar/kHf9gNxHZ3rgwyRCNQxU/bUvsbpQ/LBZHLOtpIEYFIZ96H1ouN8gOVPjpMP9O1r+PbSEUcFSd9xANa+PgvYYObFINMq1PQQhhRyWkxxcX/Dy8SCB+HVuSrgjKU+cVbL1f9uW1knt563TYbJ0WCRcaVkkDaxilCrcKMuUQhYHRqw49D00LfM6QdKX//Em/sqdM1Anm3BL2RWPUiGAjUuXU4pHohBSwxys9DooRCfANrwO5WoMd9fKnGNoMwbTEP7LHrbeq0aV3GbrJAlPAkg97Xz2EfTGn5ZlSt/wbFyE8/SfUVYK9CGJ+BJX0QXv3iIkQihhcr5Eq2HqqaytpAIqXQfufDsw2LmLrytp1BpUvWcAHpB2L91IkGSQlLEr5hW7UAQBijSKy9Fm+vBrZE00IKWwBbvTIftVtRrWm1rwZ0nTAAjQ0QcxH7S2wAI5yfZATX6D9dIHTsPUBYWDRgKyLlRKQxL7ci6nQXDPlPSf2OQPjmMGcnlorOPzio+grUyVsOtU1cl8JAobdwKlNkV7rIsMbCvbq/24672z+ogTi+5QNM9/5hSe60P7A1GxmwKl4GKcmVWqF+6eZ7SsuI3ZUnX2/lsJDSVt0ohnCgT+WK5CzHaRrjgbNUBAtpQyZIcATc48PkPzmZ7Y7yoYwAJJVXnlSWcW/ZfUh0s=
-  edge: true
+  api_key: $HEROKU_API_KEY
   on:
     tags: true
   run: python3 manage.py migrate
+  edge: true
