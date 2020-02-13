@@ -15,6 +15,9 @@ pandas = "*"
 xlrd = "*"
 django-excel = "*"
 whitenoise = "*"
+dj-database-url = "*"
+python-dotenv = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
