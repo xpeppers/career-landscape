@@ -18,7 +18,7 @@ env:
   - DJ_DB_PSW=
   - DJ_HOST=localhost
   - DJ_PORT=5433
-  - DATABASE_URL=postgres://postgres@localhost:5433/test_db
+  - DATABASE_URL="postgres://${DJ_DB_USER}:${DJ_DB_PSW}@${DJ_HOST}/${DJ_DB_NAME}"
 before_script:
 - psql -c 'create database test_db;' -U postgres
 before_install:
