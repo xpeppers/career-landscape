@@ -1,0 +1,65 @@
+.row {
+    padding: 15px;
+    margin: 5auto;
+}
+
+.card.upload {
+    border-width: 2px;
+}
+
+p {
+    font-family: 'Dosis', sans-serif;
+}
+
+li {
+    font-family: 'Dosis', sans-serif;
+}
+
+.title {
+    font-family: 'Kaushan Script', cursive;
+}
+
+.lead {
+    font-family: 'Dosis', sans-serif;
+}
+
+.card-align {
+    margin: auto;
+    width: 50%;
+}
+
+.light-grey-bg {
+    background-color: rgba(200, 210, 216, 0.97);
+}
+
+.dark-grey-bg {
+    background-color: rgba(52, 69, 78, 0.97);
+}
+
+.red-bg {
+    background-color: rgba(224,0,0, 0.97);
+}
+
+.yellow-bg {
+    background-color: rgba(235, 174, 66, 0.97);
+}
+
+.green-bg {
+    background-color: rgba(78,138,90, 0.97);
+}
+
+.light-grey-bg-op {
+    background-color: rgba(200, 210, 216, 0.80);
+}
+
+.dark-grey-bg-op {
+    background-color: rgba(52, 69, 78, 0.80);
+}
+
+.red-bg-op {
+    background-color: rgba(224,0,0, 0.80);
+}
+
+.red-text {
+    color:  rgb(224,0,0);
+}

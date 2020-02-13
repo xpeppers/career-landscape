@@ -78,7 +78,8 @@ python3 manage.py loaddata fixtures/seed.json
 To run the application:
 
 ```blank
-python3 manage.py runserver 0:8000
+python3 manage.py collectstatic
+python3 manage.py runserver 0:8000 --nostatic
 ```
 
 Go to http://127.0.0.1:8080/ to see your app.
