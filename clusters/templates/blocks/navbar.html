@@ -10,26 +10,30 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        {% if not request.user.is_superuser %}
-          <a class="nav-item nav-link active text-white" href="{% url 'clusters:users' request.user.id %}">
-            Personal
-          </a>
-        {% endif %}
-        {% if request.user.is_superuser %}
-          <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
-            Manage
-          </a>
+        {% if request.user.is_authenticated %}
+          {% if not request.user.is_superuser %}
+            <a class="nav-item nav-link active text-white" href="{% url 'clusters:users' request.user.id %}">
+              Personal
+            </a>
+          {% endif %}
+          {% if request.user.is_superuser %}
+            <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
+              Manage
+            </a>
+          {% endif %}
         {% endif %}
         <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
           About <span class="sr-only">(current)</span>
         </a>
       </div>
     </div>
-    <span class="navbar-text mr-4">
-      <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
-      Welcome, <i>{{ request.user }}</i>
-    </span>
-    <span class="navbar-text">
-      <a class="text-light mr-3" href="{% url 'logout' %}"> Logout </a>
-    </span>
+    {% if request.user.is_authenticated %}
+      <span class="navbar-text mr-4">
+        <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
+        Welcome, <i>{{ request.user }}</i>
+      </span>
+      <span class="navbar-text">
+        <a class="text-light mr-3" href="{% url 'logout' %}"> Logout </a>
+      </span>
+    {% endif %}
   </nav>

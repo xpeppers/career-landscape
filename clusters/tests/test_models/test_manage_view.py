@@ -288,3 +288,17 @@ class ManageViewTest(TransactionTestCase):
             response = client.post("/manage/", {"file": xlsx_file}, follow=True)
 
         self.assertEqual(len(Score.objects.all()), 0)
+
+    def test_normal_user_accessing_manage_view_will_be_redirect_to_login_with_message(
+        self,
+    ):
+        user_username = "firstuser"
+        user_psw = "mypasspass"
+        user = UserFactory.build(username=user_username, password=user_psw)
+        user.save()
+        client = Client()
+        client.login(username=user_username, password=user_psw)
+
+        response = client.get("/manage/", follow=True)
+
+        self.assertContains(response, "Your account doesn't have access to this page.")

@@ -91,3 +91,38 @@ class UserViewTest(TestCase):
             response,
             f"by { user_first_name.capitalize() } { user_last_name.capitalize() }",
         )
+
+    def test_normal_user_cannot_access_other_user_personal_page(self):
+        user_1_username = "firstuser"
+        user_1_psw = "mypasspass"
+        user_1 = UserFactory.build(username=user_1_username, password=user_1_psw)
+        user_1.save()
+        user_2 = UserFactory.build()
+        user_2.save()
+        client = Client()
+        client.login(username=user_1_username, password=user_1_psw)
+
+        response = client.get(f"/users/{user_2.id}")
+
+        self.assertContains(response, "We are sorry, you cannot access this page.")
+
+    def test_a_user_can_access_his_personal_page(self):
+        user_username = "firstuser"
+        user_psw = "mypasspass"
+        user_first_name = "userfn"
+        user_last_name = "userln"
+        user = UserFactory.build(
+            username=user_username,
+            password=user_psw,
+            first_name=user_first_name,
+            last_name=user_last_name,
+        )
+        user.save()
+        client = Client()
+        client.login(username=user_username, password=user_psw)
+
+        response = client.get(f"/users/{user.id}")
+
+        self.assertContains(
+            response, f"{user_first_name.capitalize()} {user_last_name.capitalize()}"
+        )

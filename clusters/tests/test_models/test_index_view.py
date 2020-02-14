@@ -228,9 +228,21 @@ class IndexViewTest(TestCase):
             f'{second_circle_topic.name} : <span class="badge dark-grey-bg text-white">1</span>',
         )
 
-    def test_if_not_logged_in_IndexView_redirect_to_login_page(self):
+    def test_not_logged_person_accessing_index_will_be_redirect_to_login_page(self):
         client = Client()
 
         response = client.get("/", follow=True)
 
         self.assertContains(response, "Login")
+
+    def test_normal_logged_user_can_access_index_view(self):
+        user_username = "firstuser"
+        user_psw = "mypasspass"
+        user = UserFactory.build(username=user_username, password=user_psw)
+        user.save()
+        client = Client()
+        client.login(username=user_username, password=user_psw)
+
+        response = client.get("/")
+
+        self.assertContains(response, "No Circle available")
