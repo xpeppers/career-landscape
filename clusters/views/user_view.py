@@ -1,19 +1,24 @@
 from django.views import generic
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect
+from django.contrib import messages
 
 from django.contrib.auth.models import User
 from clusters.models import Circle, Topic, Dimension, Score
 
 
-@method_decorator(staff_member_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class UserView(generic.TemplateView):
     template_name = "clusters/users.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_id = self.kwargs["user_id"]
+        if user_id != self.request.user.id and not self.request.user.is_superuser :
+            messages.error(self.request, 'We are sorry, you cannot access this page. You can only access your personal page. Please check your credentials.')
+            return
         selected_circle = self.request.GET.get("selected_user_circle", -1)
         if selected_circle != -1:
             context["user_topics_values"] = self.add_circle_context(

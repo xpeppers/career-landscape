@@ -41,9 +41,16 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
-                Manage
-          </a>
+          {% if not request.user.is_superuser %}
+            <a class="nav-item nav-link active text-white" href="{% url 'clusters:users' request.user.id %}">
+              Personal
+            </a>
+          {% endif %}
+          {% if request.user.is_superuser %}
+            <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
+              Manage
+            </a>
+          {% endif %}
           <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
             About <span class="sr-only">(current)</span>
           </a>
@@ -60,7 +67,22 @@
 
 
     <div class='container-fluid clearfix'>
-
+      {% if messages %}
+        {% for message in messages%}
+          {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="alert alert-danger alert-dismissible fade show">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
         <div class="row">
             <div class=" shadow card p-3 col-md-12">
                 <h3 class="text-justify title text-center">
@@ -163,10 +185,8 @@
                 entirely filled by {{ first_name }} {{ last_name }}
             </p>
         {% endif %}
-
-
+     {% endif %}
     </div>
-    <hr>
     <footer
       id="sticky-footer"
       class="footer fixed-bottom mt-auto py-2 dark-grey-bg text-white-50"

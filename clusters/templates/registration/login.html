@@ -42,9 +42,11 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
-                Manage
-          </a>
+          {% if request.user.is_superuser %}
+            <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
+              Manage
+            </a>
+          {% endif %}
           <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
             About <span class="sr-only">(current)</span>
           </a>
@@ -54,29 +56,40 @@
 
     {% block content %}
       <div class="container-fluid clearfix">
-        <div class="row p-3">
-          <div class="col-md-2"></div>
-          <div class="col-md-8 d-flex justify-content-center">
-
+        <div class="row">
+          <div class="col-md-12">
             {% if form.errors %}
-              <div class="alert alert-danger" role="alert">
-                <p>Your username and password didn't match. Please try again.</p>
+              <div class="alert alert-danger alert-dismissible fade show">
+                Your username and password didn't match. Please try again.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>
             {% endif %}
 
             {% if next %}
               {% if user.is_authenticated %}
-                <div class="alert alert-warning" role="alert">
-                  <p>Your account doesn't have access to this page. To proceed,
-                    please login with an account that has access.</p>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                  Your account doesn't have access to this page. To proceed,
+                  please login with an account that has access.
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
                 </div>
               {% else %}
-              <div class="alert alert-info" role="alert">
-                <p>Please login to see this page.</p>
+              <div class="alert alert-info alert-dismissible fade show" role="alert">
+                Please login to see this page.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>
               {% endif %}
             {% endif %}
-
+          </div>
+        </div>
+        <div class="row p-3">
+          <div class="col-md-2"></div>
+          <div class="col-md-8 d-flex justify-content-center">
             <div class="shadow card p-3 m-5" style="width: 18rem;">
               <h4 class="card-title mb-2">
                 <img src="{% static "clusters/images/shield-lock-fill.svg" %}" alt="" width="38" height="38" title="Documents">
