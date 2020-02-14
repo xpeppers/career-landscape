@@ -1,72 +1,9 @@
-<!doctype html>
 
-{% load static %}
+{% include "blocks/header.html" %}
+<body>
+{% include "blocks/navbar.html" %}
 
-<html lang="en">
-  <head>
-    <title>Clusters</title>
-
-    <meta charset="utf-8">
-    <meta name="description" content="clusters">
-
-    <link rel="icon" href="{% static "clusters/images/favicon.ico" %}" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-      crossorigin="anonymous"
-    >
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Dosis|Kaushan+Script&display=swap"
-    >
-    <link
-      rel="stylesheet"
-      href="{% static "clusters/css/style.css" %}"
-    >
-
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  </head>
-
-  <body>
-    <nav class="navbar sticky-top navbar-expand-lg dark-grey-bg text-white">
-      <a class="navbar-brand text-white title" href="{% url 'clusters:index' %}">
-        Career Landscape
-      </a>
-      <button class="navbar-toggler type="button"
-        data-toggle="collapse" data-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false"
-        aria-label="Toggle navigation"
-      ><img src="{% static "clusters/images/justify.svg" %}" alt="" width="32" height="32" title="Documents">
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          {% if not request.user.is_superuser %}
-            <a class="nav-item nav-link active text-white" href="{% url 'clusters:users' request.user.id %}">
-              Personal
-            </a>
-          {% endif %}
-          {% if request.user.is_superuser %}
-            <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
-              Manage
-            </a>
-          {% endif %}
-          <a class="nav-item nav-link active text-white" href="{% url 'clusters:about' %}">
-            About <span class="sr-only">(current)</span>
-          </a>
-        </div>
-      </div>
-      <span class="navbar-text mr-4">
-        <img src="{% static "clusters/images/person-fill.svg" %}" alt="" width="32" height="32" title="Documents">
-        Welcome, <i>{{ request.user }}</i>
-      </span>
-      <span class="navbar-text">
-        <a class="text-light mr-3" href="{% url 'logout' %}"> Logout </a>
-      </span>
-    </nav>
-
-
-    <div class='container-fluid clearfix'>
+  <div class='container-fluid clearfix'>
       {% if messages %}
         {% for message in messages%}
           {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
@@ -182,23 +119,13 @@
             <h3 class="p-3 card title bg-secondary text-white text-center">{{circle_name}}</h3>
             <p class="p-3 card bg-danger text-white text-center">
                 <b> - information not available - </b><br> The {{circle_name}} Circle was not partially or
-                entirely filled by {{ first_name }} {{ last_name }}
+                entirely filled by {{ first_name|title }} {{ last_name|title }}
             </p>
         {% endif %}
      {% endif %}
-    </div>
-    <footer
-      id="sticky-footer"
-      class="footer fixed-bottom mt-auto py-2 dark-grey-bg text-white-50"
-      style="margin-bottom:0px"
-    >
-      <div class="container text-center">
-        <small>
-          Copyright &copy; <span class="title">XPeppers, a Claranet Group Company</span>
-        </small>
-      </div>
-    </footer>
+     </div>
 
+    {% include "blocks/footer.html" %}
 
     {{ user_topics_values|json_script:"topic-json-data" }}
     <script>
@@ -273,21 +200,7 @@
     }
     </script>
 
+  {% include "blocks/scripts.html" %}
 
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-      crossorigin="anonymous"
-    ></script>
-  </body>
+</body>
 </html>
