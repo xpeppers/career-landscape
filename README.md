@@ -20,6 +20,7 @@ Create a .env file with these variables:
 - DJ_DB_PSW="the user password"
 - DJ_DB_HOST="localhost"
 - DJ_DB_PORT="" for local development
+- DATABASE_URL="postgres://${DJ_DB_USER}:${DJ_DB_PSW}@${DJ_DB_HOST}/${DJ_DB_NAME}"
 
 ## Instructions
 
