@@ -28,7 +28,7 @@ install:
 script:
 - pipenv run python manage.py migrate
 - pipenv run black --check ./
-- pipenv run python manage.py test
+- pipenv run python manage.py test clusters/tests/test_models
 
 deploy:
   provider: heroku:git
