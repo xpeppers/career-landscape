@@ -91,10 +91,12 @@ def create_example_excel_file_topics_numbers():
     ]
 
 
-def get_logged_staff_client():
+def get_logged_superuser_client():
     username = "myuser"
     password = "myusmypass"
-    user = UserFactory.build(username=username, password=password, is_staff=True)
+    user = UserFactory.build(
+        username=username, password=password, is_superuser=True, is_staff=True
+    )
     user.save()
     client = Client()
     client.login(username=username, password=password)

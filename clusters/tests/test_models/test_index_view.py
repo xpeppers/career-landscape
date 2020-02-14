@@ -15,7 +15,7 @@ from clusters.tests.factories.dimension import DimensionFactory
 
 class IndexViewTest(TestCase):
     def test_index_shows_cirle_and_topics_names(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         topic_name = "testTopic"
         circle_name = "testCircle"
         circle = CircleFactory.create(name=circle_name)
@@ -26,13 +26,13 @@ class IndexViewTest(TestCase):
         self.assertContains(response, topic_name)
 
     def test_index_with_no_circle_print_message(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
 
         response = client.get("/")
         self.assertContains(response, "No Circle available.")
 
     def test_index_with_no_topic_in_circle_print_message(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         circle = CircleFactory.create()
         circle.save()
 
@@ -40,7 +40,7 @@ class IndexViewTest(TestCase):
         self.assertContains(response, "No Topics available.")
 
     def test_index_shows_topics_numbers(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         create_sample_with_score_values([1, 1, 0, 1])
 
         response = client.get("/")
@@ -59,7 +59,7 @@ class IndexViewTest(TestCase):
         )
 
     def test_filtered_view_shows_only_selected_range_of_values(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         create_sample_with_score_values([1, 5, 4, 2])
         circle_id = Topic.objects.filter(name="topic0").first().circle.id
 
@@ -78,7 +78,7 @@ class IndexViewTest(TestCase):
         )
 
     def test_filtered_view_shows_only_selected_dimensions_score(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         circle = CircleFactory.create()
         topic = TopicFactory.create(name="topic", circle=circle)
         dimension_one = DimensionFactory.create(name="dimension_one", topic=topic)
@@ -132,7 +132,7 @@ class IndexViewTest(TestCase):
         self.assertEqual(value, 1)
 
     def test_index_view_shows_all_circle_names(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         circles = [CircleFactory.create() for _ in range(4)]
         circles_names = [circle.name for circle in circles]
 
@@ -142,7 +142,7 @@ class IndexViewTest(TestCase):
             self.assertContains(response, name)
 
     def test_index_view_shows_all_topics_of_different_circles(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         first_circle = CircleFactory.create()
         second_circle = CircleFactory.create()
         first_circle_topics = [
@@ -161,7 +161,7 @@ class IndexViewTest(TestCase):
             self.assertContains(response, topic_name)
 
     def test_alter_circle_value_filter_not_alter_others_circle_value_filter(self):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         person = create_users(1)[0]
         first_circle = CircleFactory.create()
         second_circle = CircleFactory.create()
@@ -190,7 +190,7 @@ class IndexViewTest(TestCase):
     def test_alter_circle_dimension_filter_not_alter_others_circle_dimension_filter(
         self,
     ):
-        client = get_logged_staff_client()
+        client = get_logged_superuser_client()
         person = create_users(1)[0]
         first_circle = CircleFactory.create()
         second_circle = CircleFactory.create()
