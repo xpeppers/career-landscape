@@ -126,3 +126,23 @@ class UserViewTest(TestCase):
         self.assertContains(
             response, f"{user_first_name.capitalize()} {user_last_name.capitalize()}"
         )
+
+    def test_a_staff_user_can_access_all_users_pages(self):
+        user_username = "firstuser"
+        user_psw = "mypasspass"
+        user = UserFactory.build(
+            username=user_username, password=user_psw, is_staff=True,
+        )
+        user.save()
+        first_name = "user2fn"
+        last_name = "user2ln"
+        user_2 = UserFactory.build(first_name=first_name, last_name=last_name)
+        user_2.save()
+        client = Client()
+        client.login(username=user_username, password=user_psw)
+
+        response = client.get(f"/users/{user_2.id}")
+
+        self.assertContains(
+            response, f"{first_name.capitalize()} {last_name.capitalize()}"
+        )

@@ -16,8 +16,10 @@ class UserView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_id = self.kwargs["user_id"]
-        if user_id != self.request.user.id and (
-            not self.request.user.is_staff or not self.request.user.is_superuser
+        if (
+            user_id != self.request.user.id
+            and not self.request.user.is_staff
+            and not self.request.user.is_superuser
         ):
             messages.error(
                 self.request,

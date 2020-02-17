@@ -16,7 +16,7 @@
               Personal
             </a>
           {% endif %}
-          {% if request.user.is_superuser %}
+          {% if request.user.is_superuser or request.user.is_staff %}
             <a class="nav-item nav-link active text-white" href="{% url 'clusters:manage' %}">
               Manage
             </a>
